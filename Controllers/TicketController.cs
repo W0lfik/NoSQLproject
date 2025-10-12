@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using NoSQLproject.Models;
 using NoSQLproject.Repositories.Interfaces;
 
 namespace NoSQLproject.Controllers;
@@ -14,6 +15,7 @@ public class TicketController : Controller
     
     public IActionResult Index()
     {
-        return View();
+        List<Ticket> tickets = _ticketRepository.GetAllTickets();
+        return View(tickets);
     }
 }

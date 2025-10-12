@@ -17,7 +17,12 @@ public class TicketRepository : ITicketRepository
         // access the "ticket" collection
         _ticket = database.GetCollection<Ticket>("ticket");
     }
-    
+
+    public List<Ticket> GetAllTickets()
+    {
+        return _ticket.Find(ticket => true).ToList();
+    }
+
     public Ticket? GetTicketByNumber(int ticketNumber)
     {
         return _ticket.Find(t => t.TicketNumber == ticketNumber).FirstOrDefault();
