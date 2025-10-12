@@ -7,24 +7,32 @@ public class User
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } 
-    
-    public string FullName { get; set; } 
-    
+    public string Id { get; set; }
+
+    [BsonElement("fullName")]
+    public string FullName { get; set; }
+
+    [BsonElement("employeeNumber")]
     public int EmployeeNumber { get; set; }
-    
+
+    [BsonElement("password")]
     public string Password { get; set; }
-    
+
+    [BsonElement("email")]
     public string Email { get; set; }
-    
-    public int Phone { get; set; }
-    
+
+    [BsonElement("phone")]
+    [BsonRepresentation(BsonType.String)]
+    public string Phone { get; set; }
+
+    [BsonElement("location")]
     public string Location { get; set; }
-    
+
     [BsonElement("typeOfUser")]
+    [BsonRepresentation(BsonType.String)] 
     public TypeOfUser TypeOfUser { get; set; }
     
-    public User(string id, string fullName, int employeeNumber, string password, string email, int phone, string location, TypeOfUser typeOfUser)
+    public User(string id, string fullName, int employeeNumber, string password, string email, string phone, string location, TypeOfUser typeOfUser)
     {
         Id = id;
         FullName = fullName;

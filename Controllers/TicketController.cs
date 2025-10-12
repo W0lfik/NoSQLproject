@@ -18,4 +18,32 @@ public class TicketController : Controller
         List<Ticket> tickets = _ticketRepository.GetAllTickets();
         return View(tickets);
     }
+    
+    
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View(); 
+    }
+    
+    [HttpPost]
+    public IActionResult Create(Ticket ticket)
+    {
+        Console.WriteLine("POST Create() called");
+
+        // for testing, some required fields
+        ticket.CreatedAt = DateTime.UtcNow;
+        ticket.ResolvedAt = DateTime.UtcNow;
+        ticket.CreatedBy = new User { FullName = "Test User" };
+        ticket.HandledBy = new List<User>
+        {
+            new User { FullName = "Support Agent" }
+        };;
+
+        _ticketRepository.CreateTicket(ticket);
+
+        Console.WriteLine("Ticket inserted");
+        return RedirectToAction(nameof(Index));
+    }
+
 }
