@@ -1,0 +1,36 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model NoSQLproject.Models.User
+
+@{
+    ViewData["Title"] = "Login";
+
+    if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert"> @ViewBag.ErrorMessage</div>
+    }
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div>
+        <h4 class="text-center mb-4">Login</h4>
+
+        <form action="/User/Login" method="POST" class="border p-4 rounded shadow bg-light">
+            <div class="form-group py-2">
+                <label for="UserName">Username:</label>
+                <input type="text" id="UserName" name="UserName" class="form-control" required value="@Model?.UserName" />
+            </div>
+
+            <div class="form-group py-2">
+                <label for="Password">Password:</label>
+                <input type="password" id="Password" name="Password" class="form-control" required value="@Model?.Password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
