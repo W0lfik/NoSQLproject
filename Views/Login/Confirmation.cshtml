@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Registration Successful";
+}
+
+<h2>Registration Successful!</h2>
+
+<div class="card p-3 mt-3" style="max-width:400px;">
+    <p><strong>Name:</strong> @ViewBag.FullName</p>
+    <p><strong>Employee Number:</strong> @ViewBag.EmployeeNumber</p>
+    <p><strong>Role:</strong> @ViewBag.Role</p>
+</div>
+
+<p class="mt-3">
+    Please save your employee number — you will need it to log in.
+</p>
+
+<a href="@Url.Action("Login", "Login")" class="btn btn-primary">Proceed to Login</a>

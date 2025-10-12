@@ -17,14 +17,14 @@ public class User
     
     public string Email { get; set; }
     
-    public int Phone { get; set; }
+    public string Phone { get; set; }
     
     public string Location { get; set; }
     
     [BsonElement("typeOfUser")]
     public TypeOfUser TypeOfUser { get; set; }
     
-    public User(string id, string fullName, int employeeNumber, string password, string email, int phone, string location, TypeOfUser typeOfUser)
+    public User(string id, string fullName, int employeeNumber, string password, string email, string phone, string location, TypeOfUser typeOfUser)
     {
         Id = id;
         FullName = fullName;
