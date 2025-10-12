@@ -21,13 +21,13 @@
 
         <form action="/User/Login" method="POST" class="border p-4 rounded shadow bg-light">
             <div class="form-group py-2">
-                <label for="UserName">Username:</label>
-                <input type="text" id="UserName" name="UserName" class="form-control" required value="@Model?.UserName" />
+                <label for="UserName">Employee Number:</label>
+                <input type="text" id="UserName" name="UserName" class="form-control" required value="@Model?.employeeNumber" />
             </div>
 
             <div class="form-group py-2">
                 <label for="Password">Password:</label>
-                <input type="password" id="Password" name="Password" class="form-control" required value="@Model?.Password" />
+                <input type="password" id="Password" name="Password" class="form-control" required value="@Model?.password" />
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Login</button>
