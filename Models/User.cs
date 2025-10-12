@@ -1,26 +1,39 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace NoSQLproject.Models;
 
 public class User
 {
-    public string id { get; set; } 
-    public string fullName { get; set; } 
-    public int employeeNumber { get; set; }
-    public string password { get; set; }
-    public string email { get; set; }
-    public int phone { get; set; }
-    public string location { get; set; }
-    public TypeOfUser typeOfUser { get; set; }
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } 
+    
+    public string FullName { get; set; } 
+    
+    public int EmployeeNumber { get; set; }
+    
+    public string Password { get; set; }
+    
+    public string Email { get; set; }
+    
+    public int Phone { get; set; }
+    
+    public string Location { get; set; }
+    
+    [BsonElement("typeOfUser")]
+    public TypeOfUser TypeOfUser { get; set; }
     
     public User(string id, string fullName, int employeeNumber, string password, string email, int phone, string location, TypeOfUser typeOfUser)
     {
-        this.id = id;
-        this.fullName = fullName;
-        this.employeeNumber = employeeNumber;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.location = location;
-        this.typeOfUser = typeOfUser;
+        Id = id;
+        FullName = fullName;
+        EmployeeNumber = employeeNumber;
+        Password = password;
+        Email = email;
+        Phone = phone;
+        Location = location;
+        TypeOfUser = typeOfUser;
     }
     
     public User() { }

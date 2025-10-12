@@ -1,36 +1,57 @@
 using System.Collections;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace NoSQLproject.Models;
 
 public class Ticket
 {
-    public string id { get; set; }
-    public int ticketNumber { get; set; }
-    public DateTime createdAt { get; set; }
-    public IncedentType incedentType { get; set; }
-    public Priority priority { get; set; }
-    public DateTime deadline { get; set; }
-    public string description { get; set; }
-    public State state { get; set; }
-    public string title { get; set; }
-    public DateTime resolvedAt { get; set; }
-    public User createdBy { get; set; }
-    public List<User> handledBy { get; set; }
+    [BsonId] 
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
+    
+    public int TicketNumber { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+    
+    [BsonElement("incidentType")]
+    [BsonRepresentation(BsonType.String)] 
+    public IncedentType IncedentType { get; set; }
+    
+    [BsonElement("priority")]
+    [BsonRepresentation(BsonType.String)] 
+    public Priority Priority { get; set; }
+    
+    public DateTime Deadline { get; set; }
+    
+    public string Description { get; set; }
+    
+    [BsonElement("state")]
+    [BsonRepresentation(BsonType.String)] 
+    public State State { get; set; }
+    
+    public string Title { get; set; }
+    
+    public DateTime ResolvedAt { get; set; }
+    
+    public User CreatedBy { get; set; }
+    
+    public List<User> HandledBy { get; set; }
     
     public Ticket(string id, int ticketNumber, DateTime createdAt, IncedentType incedentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, User createdBy, List<User> handledBy)
     {
-        this.id = id;
-        this.ticketNumber = ticketNumber;
-        this.createdAt = createdAt;
-        this.incedentType = incedentType;
-        this.priority = priority;
-        this.deadline = deadline;
-        this.description = description;
-        this.state = state;
-        this.title = title;
-        this.resolvedAt = resolvedAt;
-        this.createdBy = createdBy;
-        this.handledBy = handledBy;
+        Id = id;
+        TicketNumber = ticketNumber;
+        CreatedAt = createdAt;
+        IncedentType = incedentType;
+        Priority = priority;
+        Deadline = deadline;
+        Description = description;
+        State = state;
+        Title = title;
+        ResolvedAt = resolvedAt;
+        CreatedBy = createdBy;
+        HandledBy = handledBy;
     }
     
     public Ticket() { }
