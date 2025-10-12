@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NoSQLproject.Models;
 using NoSQLproject.Repositories.Interfaces;
@@ -17,7 +18,12 @@ public class TicketRepository : ITicketRepository
         // access the "ticket" collection
         _ticket = database.GetCollection<Ticket>("ticket");
     }
-    
+
+    public List<Ticket> GetAllTickets()
+    {
+        return _ticket.Find(ticket => true).ToList();
+    }
+
     public Ticket? GetTicketByNumber(int ticketNumber)
     {
         return _ticket.Find(t => t.TicketNumber == ticketNumber).FirstOrDefault();
@@ -25,7 +31,15 @@ public class TicketRepository : ITicketRepository
 
     public void CreateTicket(Ticket ticket)
     {
-        _ticket.InsertOne(ticket);
+        try
+        {
+            _ticket.InsertOne(ticket);
+            Console.WriteLine("Insert successful!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Mongo insert error: " + ex.Message);
+        }
     }
 
     public void UpdateTicket(Ticket ticket)
