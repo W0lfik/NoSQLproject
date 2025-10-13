@@ -75,24 +75,65 @@
         }
 
         <h4 class="mt-4">Handled By</h4>
+        @{int i = 0;}
         @if (Model.HandledBy != null && Model.HandledBy.Any())
         {
             <ul class="list-group">
-                @foreach (var h in Model.HandledBy)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>
-              <strong>@h.FullName</strong>
-              <span class="text-muted">(@h.EmployeeNumber) — @h.TypeOfUser</span>
-            </span>
+            @foreach (var h in Model.HandledBy)
+            {
+                var collapseId = $"handler-{i}";
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary me-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#@collapseId"
+                                    aria-expanded="false"
+                                    aria-controls="@collapseId">
+                                <span class="caret">▸</span>
+                            </button>
+                            <div>
+                                <strong>@h.FullName</strong>
+                                <span class="text-muted">(@h.EmployeeNumber) — @h.TypeOfUser</span>
+                            </div>
+                        </div>
                         <span class="text-muted">@h.Email</span>
-                    </li>
-                }
+                    </div>
+
+                    <div class="collapse mt-2" id="@collapseId">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3">Email</dt>
+                            <dd class="col-sm-9">@h.Email</dd>
+
+                            <dt class="col-sm-3">Phone</dt>
+                            <dd class="col-sm-9">@h.Phone</dd>
+
+                            <dt class="col-sm-3">Location</dt>
+                            <dd class="col-sm-9">@h.Location</dd>
+
+                            <dt class="col-sm-3">Employee Number</dt>
+                            <dd class="col-sm-9">@h.EmployeeNumber</dd>
+
+                            <dt class="col-sm-3">Role</dt>
+                            <dd class="col-sm-9">@h.TypeOfUser</dd>
+                        </dl>
+                    </div>
+                </li>
+                i++;
+            }
             </ul>
         }
         else
         {
             <p class="text-muted">No handlers assigned yet.</p>
         }
+
+        <style>
+            /* Rotate the caret when open */
+            button[aria-expanded="true"] .caret { transform: rotate(90deg); }
+            .caret { display:inline-block; transition: transform .15s ease-in-out; }
+        </style>
+
     </div>
 </div>
