@@ -1,51 +1,61 @@
-@model NoSQLproject.Models.Ticket
-
-@{
-    ViewData["Title"] = "Create Ticket";
-}
+@model CreateTicketViewModel
 
 <h2>Create Ticket</h2>
 
 <form asp-action="Create" method="post">
     <div class="mb-3">
-        <label asp-for="TicketNumber" class="form-label"></label>
-        <input asp-for="TicketNumber" class="form-control" />
-        <span asp-validation-for="TicketNumber" class="text-danger"></span>
+        <label asp-for="Ticket.TicketNumber" class="form-label"></label>
+        <input asp-for="Ticket.TicketNumber" class="form-control" />
+        <span asp-validation-for="Ticket.TicketNumber" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+        <label asp-for="Ticket.Title" class="form-label"></label>
+        <input asp-for="Ticket.Title" class="form-control" />
+        <span asp-validation-for="Ticket.Title" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
+        <label asp-for="Ticket.Description" class="form-label"></label>
+        <textarea asp-for="Ticket.Description" class="form-control"></textarea>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Priority" class="form-label"></label>
-        <select asp-for="Priority" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.Priority>()"></select>
+        <label asp-for="Ticket.Priority" class="form-label"></label>
+        <select asp-for="Ticket.Priority" class="form-select"
+                asp-items="Html.GetEnumSelectList<Priority>()"></select>
     </div>
 
     <div class="mb-3">
-        <label asp-for="IncidentType" class="form-label"></label>
-        <select asp-for="IncidentType" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.IncidentType>()"></select>
+        <label asp-for="Ticket.IncidentType" class="form-label"></label>
+        <select asp-for="Ticket.IncidentType" class="form-select"
+                asp-items="Html.GetEnumSelectList<IncidentType>()"></select>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Deadline" class="form-label"></label>
-        <input asp-for="Deadline" type="date" class="form-control" />
+        <label asp-for="Ticket.State" class="form-label"></label>
+        <select asp-for="Ticket.State" class="form-select"
+                asp-items="Html.GetEnumSelectList<State>()"></select>
+    </div>
+
+    <!-- Created By (single, optional) -->
+    <div class="mb-3">
+        <label class="form-label">Created By</label>
+        <select asp-for="CreatedByUserId" asp-items="Model.UsersSelect" class="form-select">
+            <option value="">-- None --</option>
+        </select>
+    </div>
+
+    <!-- Handled By (multi, optional) -->
+    <div class="mb-3">
+        <label class="form-label">Handled By</label>
+        <select asp-for="HandledByUserIds" asp-items="Model.UsersSelect" class="form-select" multiple size="6"></select>
+        <div class="form-text">Hold Ctrl/Cmd to select multiple. Leave empty for none.</div>
     </div>
 
     <div class="mb-3">
-        <label asp-for="State" class="form-label"></label>
-        <select asp-for="State" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.State>()"></select>
+        <label asp-for="Ticket.Deadline" class="form-label"></label>
+        <input asp-for="Ticket.Deadline" type="datetime-local" class="form-control" />
     </div>
 
     <button type="submit" class="btn btn-primary">Create</button>

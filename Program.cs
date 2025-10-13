@@ -6,7 +6,7 @@ using NoSQLproject.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddMvcOptions(o => o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 //Register repo
 builder.Services.AddScoped<ILoginService, LoginService>();
@@ -18,6 +18,7 @@ builder.Services.AddAuthentication("CookieAuth")
         options.LoginPath = "/Auth/Login"; // Redirect if not logged in
         options.AccessDeniedPath = "/Auth/AccessDenied";
     });
+
 
 builder.Services.AddHttpContextAccessor();
 
