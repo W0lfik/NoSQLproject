@@ -1,0 +1,98 @@
+@model NoSQLproject.Models.Ticket
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<h2>Ticket @Model.TicketNumber — @Model.Title</h2>
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@Model.Id</dd>
+
+            <dt class="col-sm-3">Ticket Number</dt>
+            <dd class="col-sm-9">@Model.TicketNumber</dd>
+
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">Incident Type</dt>
+            <dd class="col-sm-9">@Model.IncidentType</dd>
+
+            <dt class="col-sm-3">Priority</dt>
+            <dd class="col-sm-9">@Model.Priority</dd>
+
+            <dt class="col-sm-3">State</dt>
+            <dd class="col-sm-9">@Model.State</dd>
+
+            <dt class="col-sm-3">Created At</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+
+            <dt class="col-sm-3">Deadline</dt>
+            <dd class="col-sm-9">@Model.Deadline.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+
+            @if (Model.ResolvedAt != default(DateTime))
+            {
+                <dt class="col-sm-3">Resolved At</dt>
+                <dd class="col-sm-9">@Model.ResolvedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+            }
+        </dl>
+
+        <h4 class="mt-4">Created By</h4>
+        @if (Model.CreatedBy is not null)
+        {
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.FullName</dd>
+
+                <dt class="col-sm-3">Employee Number</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.EmployeeNumber</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.Email</dd>
+
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.Phone</dd>
+
+                <dt class="col-sm-3">Location</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.Location</dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">@Model.CreatedBy.TypeOfUser</dd>
+            </dl>
+        }
+        else
+        {
+            <p class="text-muted">No creator assigned.</p>
+        }
+
+        <h4 class="mt-4">Handled By</h4>
+        @if (Model.HandledBy != null && Model.HandledBy.Any())
+        {
+            <ul class="list-group">
+                @foreach (var h in Model.HandledBy)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              <strong>@h.FullName</strong>
+              <span class="text-muted">(@h.EmployeeNumber) — @h.TypeOfUser</span>
+            </span>
+                        <span class="text-muted">@h.Email</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">No handlers assigned yet.</p>
+        }
+    </div>
+</div>

@@ -127,6 +127,14 @@ public class TicketController : Controller
         
         return RedirectToAction(nameof(Index));
     }
+    
+    [HttpGet("Ticket/Details/{ticketNumber:int}")]
+    public IActionResult Details(int ticketNumber)
+    {
+        var ticket = _ticketRepository.GetTicketByNumber(ticketNumber);
+        if (ticket is null) return NotFound();
+        return View(ticket); 
+    }
 
 
 }

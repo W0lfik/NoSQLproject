@@ -9,4 +9,5 @@ public interface ITicketRepository
     void CreateTicket(Ticket ticket);
     void UpdateTicket(Ticket ticket);
     void DeleteTicket(int ticketNumber);
+    Ticket? GetById(string id);
 }

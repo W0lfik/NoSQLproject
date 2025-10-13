@@ -61,5 +61,8 @@ public class TicketRepository : ITicketRepository
         _ticket.DeleteOne(t => t.TicketNumber == ticketNumber);
     }
 
-
+    public Ticket? GetById(string id)
+    {
+        return _ticket.Find(t => t.Id == id).FirstOrDefault();
+    }
 }
