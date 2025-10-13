@@ -24,54 +24,64 @@
     <!-- Tickets table -->
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
-            <tr>
-                <th>
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@ViewData["IdSortParam"]"
-                       asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">ID</a>
-                </th>
-                <th>Subject</th>
-                <th>
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@ViewData["UserSortParam"]"
-                       asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">User</a>
-                </th>
-                <th>
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@ViewData["DateSortParam"]"
-                       asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">Created</a>
-                </th>
-                <th>
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@ViewData["DeadlineSortParam"]"
-                       asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">Deadline</a>
-                </th>
-                <th>Status</th>
-            </tr>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["IdSortParam"]"
+                   asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
+                   class="text-decoration-none">ID</a>
+            </th>
+            <th>Subject</th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["UserSortParam"]"
+                   asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
+                   class="text-decoration-none">User</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["DateSortParam"]"
+                   asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
+                   class="text-decoration-none">Created</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["DeadlineSortParam"]"
+                   asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
+                   class="text-decoration-none">Deadline</a>
+            </th>
+            <th>Status</th>
+        </tr>
         </thead>
 
         <tbody>
-            @foreach (var ticket in Model)
-            {
-                <tr>
-                    <td>@ticket.TicketNumber</td>
-                    <td>@ticket.Title</td>
-                    <td>
-                        @ticket.CreatedBy?.FullName
-                        <br />
-                        <small class="text-muted">@ticket.CreatedBy?.Email</small>
-                    </td>
-                    <td>@ticket.CreatedAt.ToShortDateString()</td>
-                    <td class="@(ticket.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
-                        @ticket.Deadline.ToShortDateString()
-                    </td>
-                    <td>@ticket.State</td>
-                </tr>
-            }
+        @foreach (var ticket in Model)
+        {
+            <tr data-href="@Url.Action("Details", "Ticket", new { ticketNumber = ticket.TicketNumber })" style="cursor:pointer;">
+                <td>@ticket.TicketNumber</td>
+                <td>@ticket.Title</td>
+                <td>
+                    @ticket.CreatedBy?.FullName
+                    <br />
+                    <small class="text-muted">@ticket.CreatedBy?.Email</small>
+                </td>
+                <td>@ticket.CreatedAt.ToShortDateString()</td>
+                <td class="@(ticket.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
+                    @ticket.Deadline.ToShortDateString()
+                </td>
+                <td>@ticket.State</td>
+            </tr>
+        }
         </tbody>
     </table>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("tr[data-href]").forEach(row => {
+            row.addEventListener("click", () => {
+                window.location = row.dataset.href;
+            });
+        });
+    });
+</script>
