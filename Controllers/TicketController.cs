@@ -64,16 +64,14 @@ public class TicketController : Controller
             .Where(u => u != null)
             .ToList()!;
 
-        // sensible defaults
+        // defaults
         vm.Ticket.State = State.open;
         vm.Ticket.CreatedAt = DateTime.UtcNow;
-        // vm.Ticket.ResolvedAt = default; // set only when resolved
+        
 
         try
         {
-
             _ticketRepository.CreateTicket(vm.Ticket);
-
         }
         catch (Exception e)
         {

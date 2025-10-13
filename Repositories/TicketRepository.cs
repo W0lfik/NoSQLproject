@@ -12,11 +12,20 @@ public class TicketRepository : ITicketRepository
     
     public TicketRepository(IConfiguration config)
     {
-        _client ??= new MongoClient(config["MongoDbSettings:ConnectionString"]);
-        IMongoDatabase database = _client.GetDatabase(config["MongoDbSettings:DatabaseName"]);
+        try
+        {
 
-        // access the "ticket" collection
-        _ticket = database.GetCollection<Ticket>("ticket");
+            _client ??= new MongoClient(config["MongoDbSettings:ConnectionString"]);
+            IMongoDatabase database = _client.GetDatabase(config["MongoDbSettings:DatabaseName"]);
+
+            // access the "ticket" collection
+            _ticket = database.GetCollection<Ticket>("ticket");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("db connection failed: "+e);
+            throw;
+        }
     }
 
     public List<Ticket> GetAllTickets()
