@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITicketService, TicketService>();
+
 
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();

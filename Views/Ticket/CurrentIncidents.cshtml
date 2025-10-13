@@ -1,0 +1,159 @@
+﻿@model IEnumerable<NoSQLproject.Models.Ticket>
+
+@{
+    ViewBag.Title = "Current Incidents";
+    bool showList = ViewBag.ShowList ?? false;
+    string viewType = ViewBag.ViewType ?? "open";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 fw-bold">Current incidents</h2>
+
+    <div class="d-flex flex-wrap gap-4">
+        <!-- Unresolved Incidents Card -->
+        <div class="card border-warning p-4 flex-fill" style="max-width: 350px;">
+            <h5 class="fw-bold text-warning">Unresolved incidents</h5>
+            <p class="text-secondary mb-4">All tickets currently open</p>
+
+            <div class="position-relative mx-auto" style="width:150px; height:150px;">
+                <svg width="150" height="150" viewBox="0 0 36 36">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#eee" stroke-width="3" />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
+                          fill="none" stroke="#f9a825" stroke-width="3"
+                          stroke-dasharray="@((ViewBag.OpenTickets * 100 / Math.Max(ViewBag.TotalTickets, 1))).ToString(" F0"), 100" />
+                </svg>
+                <div class="position-absolute top-50 start-50 translate-middle fw-bold fs-4">
+                    @ViewBag.OpenTickets / @ViewBag.TotalTickets
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-action="CurrentIncidents"
+                   asp-route-showList="true"
+                   asp-route-viewType="open"
+                   class="btn btn-primary">
+                    SHOW LIST
+                </a>
+            </div>
+        </div>
+
+        <!-- Overdue Incidents Card -->
+        <div class="card border-danger p-4 flex-fill" style="max-width: 350px;">
+            <h5 class="fw-bold text-danger">Overdue incidents</h5>
+            <p class="text-secondary mb-4">Tickets past their deadline</p>
+
+            <div class="position-relative mx-auto" style="width:150px; height:150px;">
+                <svg width="150" height="150" viewBox="0 0 36 36">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#eee" stroke-width="3" />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
+                          fill="none" stroke="#dc3545" stroke-width="3"
+                          stroke-dasharray="@((ViewBag.OverdueTickets * 100 / Math.Max(ViewBag.TotalTickets, 1))).ToString(" F0"), 100" />
+                </svg>
+                <div class="position-absolute top-50 start-50 translate-middle fw-bold fs-4 text-danger">
+                    @ViewBag.OverdueTickets
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-action="CurrentIncidents"
+                   asp-route-showList="true"
+                   asp-route-viewType="overdue"
+                   class="btn btn-danger">
+                    SHOW LIST
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (showList)
+    {
+        <div id="ticketList" class="mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">
+                    @(viewType == "overdue" ? "Overdue Tickets" : "Open Tickets")
+                </h4>
+
+                <div>
+                    <a asp-action="Create" class="btn btn-success me-2">CREATE INCIDENT</a>
+                    <a asp-action="Index" class="btn btn-secondary">SHOW ALL TICKETS</a>
+                </div>
+            </div>
+
+            <form method="get" class="d-flex justify-content-between align-items-center mb-3">
+                <input type="text"
+                       name="searchEmail"
+                       value="@ViewBag.SearchEmail"
+                       class="form-control w-50"
+                       placeholder="Filter by email" />
+
+                <input type="hidden" name="showList" value="true" />
+                <input type="hidden" name="viewType" value="@viewType" />
+            </form>
+
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>
+                            <a asp-action="CurrentIncidents"
+                               asp-route-sortOrder="@ViewData["IdSortParam"]"
+                               asp-route-showList="true"
+                               asp-route-viewType="@viewType"
+                               asp-route-searchEmail="@ViewBag.SearchEmail"
+                               class="text-decoration-none">ID</a>
+                        </th>
+                        <th>Subject</th>
+                        <th>
+                            <a asp-action="CurrentIncidents"
+                               asp-route-sortOrder="@ViewData["UserSortParam"]"
+                               asp-route-showList="true"
+                               asp-route-viewType="@viewType"
+                               asp-route-searchEmail="@ViewBag.SearchEmail"
+                               class="text-decoration-none">User</a>
+                        </th>
+                        <th>
+                            <a asp-action="CurrentIncidents"
+                               asp-route-sortOrder="@ViewData["DateSortParam"]"
+                               asp-route-showList="true"
+                               asp-route-viewType="@viewType"
+                               asp-route-searchEmail="@ViewBag.SearchEmail"
+                               class="text-decoration-none">Created</a>
+                        </th>
+                        <th>
+                            <a asp-action="CurrentIncidents"
+                               asp-route-sortOrder="@ViewData["DeadlineSortParam"]"
+                               asp-route-showList="true"
+                               asp-route-viewType="@viewType"
+                               asp-route-searchEmail="@ViewBag.SearchEmail"
+                               class="text-decoration-none">Deadline</a>
+                        </th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var ticket in Model)
+                    {
+                        <tr>
+                            <td>@ticket.TicketNumber</td>
+                            <td>@ticket.Title</td>
+                            <td>
+                                @ticket.CreatedBy?.FullName
+                                <br />
+                                <small class="text-muted">@ticket.CreatedBy?.Email</small>
+                            </td>
+                            <td>@ticket.CreatedAt.ToShortDateString()</td>
+                            <td class="@(ticket.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
+                                @ticket.Deadline.ToShortDateString()
+                            </td>
+                            <td>@ticket.State</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+    }
+</div>
