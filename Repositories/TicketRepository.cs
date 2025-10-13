@@ -20,6 +20,12 @@ public class TicketRepository : ITicketRepository
 
             // access the "ticket" collection
             _ticket = database.GetCollection<Ticket>("ticket");
+            
+            var keys = Builders<Ticket>.IndexKeys.Ascending(t => t.TicketNumber);
+            _ticket.Indexes.CreateOne(
+                new CreateIndexModel<Ticket>(keys, new CreateIndexOptions { Unique = true })
+            );
+
         }
         catch (Exception e)
         {
@@ -40,14 +46,37 @@ public class TicketRepository : ITicketRepository
 
     public void CreateTicket(Ticket ticket)
     {
+        // 1) server-side defaults
+        ticket.CreatedAt = DateTime.UtcNow;
+        ticket.HandledBy = new List<User>();
+
+        // 2) assign TicketNumber if missing/zero
+        if (ticket.TicketNumber <= 0)
+        {
+            var last = _ticket.Find(FilterDefinition<Ticket>.Empty)
+                .SortByDescending(t => t.TicketNumber)
+                .Limit(1)
+                .FirstOrDefault();
+            ticket.TicketNumber = (last?.TicketNumber ?? 0) + 1;
+        }
+
+        // 3) insert; retry once if dup (race)
         try
         {
             _ticket.InsertOne(ticket);
             Console.WriteLine("Insert successful!");
         }
-        catch (Exception ex)
+        catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
-            Console.WriteLine("Mongo insert error: " + ex.Message);
+            // someone inserted the same number just before us → recompute and retry once
+            var last = _ticket.Find(FilterDefinition<Ticket>.Empty)
+                .SortByDescending(t => t.TicketNumber)
+                .Limit(1)
+                .FirstOrDefault();
+            ticket.TicketNumber = (last?.TicketNumber ?? 0) + 1;
+
+            _ticket.InsertOne(ticket);
+            Console.WriteLine("Insert successful after retry!");
         }
     }
 

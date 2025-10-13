@@ -113,7 +113,6 @@ public class TicketController : Controller
         vm.Ticket.State = State.open;
         vm.Ticket.CreatedAt = DateTime.UtcNow;
         
-
         try
         {
             _ticketRepository.CreateTicket(vm.Ticket);
