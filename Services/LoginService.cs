@@ -8,34 +8,34 @@ namespace NoSQLproject.Services
 {
     public class LoginService : ILoginService
     {
-        private ILoginRepository _loginRepository;
+        private IUserRepository _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LoginService(ILoginRepository loginRepository, IHttpContextAccessor httpContextAccessor)
+        public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _loginRepository = loginRepository;
+            _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
         public void Register(User user)
         {
-            _loginRepository.CreateUser(user);
+            _userRepository.CreateUser(user);
         }
 
         public List<User> GetAllUsers()
         {
-            return  _loginRepository.GetAllUsers();
+            return  _userRepository.GetAllUsers();
         }
 
         public bool Login(int employeeNumber, string password)
         {
-            var user = _loginRepository.GetByEmployeeNumber(employeeNumber);
+            var user = _userRepository.GetByEmployeeNumber(employeeNumber);
             return user != null && BCrypt.Net.BCrypt.Verify(password, user.Password);
         }
 
         public bool EmployeeNumberExists(int employeeNumber)
         {
-            return _loginRepository.GetByEmployeeNumber(employeeNumber) != null;
+            return _userRepository.GetByEmployeeNumber(employeeNumber) != null;
         }
     }
 }

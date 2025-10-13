@@ -2,7 +2,7 @@
 
 namespace NoSQLproject.Repositories.Interfaces
 {
-    public interface ILoginRepository
+    public interface IUserRepository
     {
         List<User> GetAllUsers();
         User GetByEmployeeNumber(int employeeNumber);

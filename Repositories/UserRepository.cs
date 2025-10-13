@@ -7,12 +7,12 @@ using System.Data;
 namespace NoSQLproject.Repositories
 
 {
-    public class LoginRepository : ILoginRepository 
+    public class UserRepository : IUserRepository 
     {
         private static MongoClient? _client;
         private readonly IMongoCollection<User> _user;
 
-        public LoginRepository(IConfiguration config)
+        public UserRepository(IConfiguration config)
         {
             _client ??= new MongoClient(config["MongoDbSettings:ConnectionString"]);
             IMongoDatabase database = _client.GetDatabase(config["MongoDbSettings:DatabaseName"]);
