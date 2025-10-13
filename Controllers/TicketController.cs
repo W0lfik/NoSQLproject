@@ -65,6 +65,7 @@ public class TicketController : Controller
             .ToList()!;
 
         // sensible defaults
+        vm.Ticket.State = State.open;
         vm.Ticket.CreatedAt = DateTime.UtcNow;
         // vm.Ticket.ResolvedAt = default; // set only when resolved
 
