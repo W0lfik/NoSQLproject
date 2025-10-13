@@ -60,4 +60,6 @@ public class TicketRepository : ITicketRepository
     {
         _ticket.DeleteOne(t => t.TicketNumber == ticketNumber);
     }
+
+
 }
