@@ -1,37 +1,32 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-@model NoSQLproject.Models.User
-
-@{
+﻿@{
     ViewData["Title"] = "Login";
-
-    if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-danger" role="alert"> @ViewBag.ErrorMessage</div>
-    }
+    var err = ViewBag.Error ?? ViewBag.ErrorMessage;
 }
 
 <div class="d-flex justify-content-center align-items-center vh-100">
     <div>
         <h4 class="text-center mb-4">Login</h4>
 
-        <form action="/User/Login" method="POST" class="border p-4 rounded shadow bg-light">
+        @if (err != null)
+        {
+            <div class="alert alert-danger" role="alert">@err</div>
+        }
+
+        <form asp-controller="Login" asp-action="Login" method="post" class="border p-4 rounded shadow bg-light">
+            @Html.AntiForgeryToken()
+
             <div class="form-group py-2">
-                <label for="EmployeeNumber">Employee Number:</label>
-                <input type="text" id="EmployeeNumber" name="EmployeeNumber" class="form-control" required value="@Model?.EmployeeNumber" />
+                <label for="employeeNumber">Employee Number:</label>
+                <input id="employeeNumber" name="employeeNumber" class="form-control" required />
             </div>
 
             <div class="form-group py-2">
-                <label for="Password">Password:</label>
-                <input type="password" id="Password" name="Password" class="form-control" required value="@Model?.Password" />
+                <label for="password">Password:</label>
+                <input id="password" name="password" type="password" class="form-control" required />
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Login</button>
-            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Register">Register</a>
+            <a class="nav-link text-dark mt-2" asp-controller="Login" asp-action="Register">Register</a>
         </form>
     </div>
 </div>

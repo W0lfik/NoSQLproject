@@ -35,6 +35,13 @@ namespace NoSQLproject.Repositories
         {
              _user.InsertOne(user);
         }
+        public void UpdateUser(User user) =>
+            _user.ReplaceOne(u => u.Id == user.Id, user);
 
+        public void DeleteUser(string id) =>
+            _user.DeleteOne(u => u.Id == id);   // <-- N
+        public User? GetByEmail(string email) =>
+            _user.Find(u => u.Email == email).FirstOrDefault();
+        public User? GetById(string id) => _user.Find(u => u.Id == id).FirstOrDefault();
     }
 }
