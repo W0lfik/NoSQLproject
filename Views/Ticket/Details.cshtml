@@ -5,7 +5,18 @@
 
 <h2>Ticket @Model.TicketNumber — @Model.Title</h2>
 
-<div class="mb-3">
+<div class="mb-3 d-flex gap-2">
+    <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary">
+        Edit
+    </a>
+
+    <form asp-action="Delete" asp-route-ticketNumber="@Model.TicketNumber" method="post" class="d-inline">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('Delete this ticket?');">
+            Delete
+        </button>
+    </form>
+
     <a asp-action="Index" class="btn btn-secondary">Back</a>
 </div>
 

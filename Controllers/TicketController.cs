@@ -135,6 +135,74 @@ public class TicketController : Controller
         if (ticket is null) return NotFound();
         return View(ticket); 
     }
+    
+    // GET: /Ticket/Edit/400
+[HttpGet("Ticket/Edit/{ticketNumber:int}")]
+public IActionResult Edit(int ticketNumber)
+{
+    var ticket = _ticketRepository.GetTicketByNumber(ticketNumber);
+    if (ticket is null) return NotFound();
+
+    // load users for dropdowns
+    var users = _userRepository.GetAllUsers();
+    var vm = new CreateTicketViewModel
+    {
+        Ticket = ticket,
+        CreatedByUserId = ticket.CreatedBy?.Id,
+        HandledByUserIds = ticket.HandledBy?.Select(u => u.Id).ToList() ?? new List<string>(),
+        UsersSelect = users.Select(u => new SelectListItem
+        {
+            Value = u.Id,
+            Text  = $"{u.FullName} ({u.EmployeeNumber})"
+        })
+    };
+
+    return View(vm); // Views/Ticket/Edit.cshtml (same VM as Create)
+}
+
+// POST: /Ticket/Edit
+[HttpPost]
+public IActionResult Edit(CreateTicketViewModel vm)
+{
+    // repopulate selects if validation fails
+    if (!ModelState.IsValid)
+    {
+        var users = _userRepository.GetAllUsers();
+        vm.UsersSelect = users.Select(u => new SelectListItem
+        {
+            Value = u.Id,
+            Text  = $"{u.FullName} ({u.EmployeeNumber})"
+        });
+        return View(vm);
+    }
+
+    // map selected users back to embedded objects
+    var allUsers = _userRepository.GetAllUsers();
+
+    vm.Ticket.CreatedBy = string.IsNullOrWhiteSpace(vm.CreatedByUserId)
+        ? null
+        : allUsers.FirstOrDefault(u => u.Id == vm.CreatedByUserId);
+
+    vm.Ticket.HandledBy = (vm.HandledByUserIds ?? new List<string>())
+        .Select(id => allUsers.FirstOrDefault(u => u.Id == id))
+        .Where(u => u != null)
+        .ToList()!;
+
+    // do NOT overwrite CreatedAt; keep the original value
+    vm.Ticket.HandledBy ??= new List<User>();
+
+    _ticketRepository.UpdateTicket(vm.Ticket);  // updates by TicketNumber in your repo
+    return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
+}
+
+// POST: /Ticket/Delete/400
+[HttpPost("Ticket/Delete/{ticketNumber:int}")]
+public IActionResult Delete(int ticketNumber)
+{
+    _ticketRepository.DeleteTicket(ticketNumber);
+    return RedirectToAction(nameof(Index));
+}
+
 
 
 }
