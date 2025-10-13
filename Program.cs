@@ -8,9 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//Register repo
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
-
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
     {

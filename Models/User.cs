@@ -29,8 +29,9 @@ public class User
     public string Location { get; set; }
 
     [BsonElement("typeOfUser")]
-    [BsonRepresentation(BsonType.String)]
+    [BsonRepresentation(BsonType.String)] 
     public TypeOfUser TypeOfUser { get; set; }
+    
     public User(string id, string fullName, int employeeNumber, string password, string email, string phone, string location, TypeOfUser typeOfUser)
     {
         Id = id;
