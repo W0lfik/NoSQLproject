@@ -7,6 +7,7 @@
 <div class="container mt-4">
     <h2 class="mb-4 fw-bold">Overview tickets</h2>
 
+    <!-- Search + Navigation buttons -->
     <form method="get" class="d-flex justify-content-between align-items-center mb-3">
         <input type="text"
                name="searchEmail"
@@ -20,6 +21,7 @@
         </div>
     </form>
 
+    <!-- Tickets table -->
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
             <tr>
@@ -27,30 +29,31 @@
                     <a asp-action="Index"
                        asp-route-sortOrder="@ViewData["IdSortParam"]"
                        asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">
-                        ID
-                    </a>
+                       class="text-decoration-none">ID</a>
                 </th>
                 <th>Subject</th>
                 <th>
                     <a asp-action="Index"
                        asp-route-sortOrder="@ViewData["UserSortParam"]"
                        asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">
-                        User
-                    </a>
+                       class="text-decoration-none">User</a>
                 </th>
                 <th>
                     <a asp-action="Index"
                        asp-route-sortOrder="@ViewData["DateSortParam"]"
                        asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
-                       class="text-decoration-none">
-                        Date
-                    </a>
+                       class="text-decoration-none">Created</a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["DeadlineSortParam"]"
+                       asp-route-searchEmail="@Context.Request.Query["searchEmail"]"
+                       class="text-decoration-none">Deadline</a>
                 </th>
                 <th>Status</th>
             </tr>
         </thead>
+
         <tbody>
             @foreach (var ticket in Model)
             {
@@ -63,6 +66,9 @@
                         <small class="text-muted">@ticket.CreatedBy?.Email</small>
                     </td>
                     <td>@ticket.CreatedAt.ToShortDateString()</td>
+                    <td class="@(ticket.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
+                        @ticket.Deadline.ToShortDateString()
+                    </td>
                     <td>@ticket.State</td>
                 </tr>
             }

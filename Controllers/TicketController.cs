@@ -27,27 +27,40 @@ public class TicketController : Controller
         ViewData["IdSortParam"] = sortOrder == "id_desc" ? "id_asc" : "id_desc";
         ViewData["UserSortParam"] = sortOrder == "user_desc" ? "user_asc" : "user_desc";
         ViewData["DateSortParam"] = sortOrder == "date_desc" ? "date_asc" : "date_desc";
+        ViewData["DeadlineSortParam"] = sortOrder == "deadline_desc" ? "deadline_asc" : "deadline_desc";
+
 
         return View(tickets);
     }
 
     [HttpGet]
-    public IActionResult CurrentIncidents(bool showList = false, string searchEmail = "", string sortOrder = "")
+    public IActionResult CurrentIncidents(bool showList = false, string searchEmail = "", string sortOrder = "", string viewType = "open")
     {
         var tickets = _ticketService.GetFilteredAndSortedTickets(searchEmail, sortOrder);
+
         var openTickets = tickets
             .Where(t => t.State.ToString().Equals("Open", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+        var overdueTickets = openTickets
+            .Where(t => t.Deadline < DateTime.UtcNow)
+            .ToList();
+
+        var model = viewType == "overdue" ? overdueTickets : openTickets;
+
         ViewBag.TotalTickets = tickets.Count;
         ViewBag.OpenTickets = openTickets.Count;
+        ViewBag.OverdueTickets = overdueTickets.Count;
         ViewBag.ShowList = showList;
+        ViewBag.ViewType = viewType;
 
         ViewData["IdSortParam"] = sortOrder == "id_desc" ? "id_asc" : "id_desc";
         ViewData["UserSortParam"] = sortOrder == "user_desc" ? "user_asc" : "user_desc";
         ViewData["DateSortParam"] = sortOrder == "date_desc" ? "date_asc" : "date_desc";
+        ViewData["DeadlineSortParam"] = sortOrder == "deadline_desc" ? "deadline_asc" : "deadline_desc";
 
-        return View(openTickets);
+
+        return View(model);
     }
 
 

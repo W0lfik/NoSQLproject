@@ -34,14 +34,18 @@ namespace NoSQLproject.Services
                 "id_desc" => tickets.OrderByDescending(t => t.TicketNumber).ToList(),
                 "id_asc" => tickets.OrderBy(t => t.TicketNumber).ToList(),
 
-                "user_desc" => tickets.OrderByDescending(t => t.CreatedBy?.Email).ToList(),
-                "user_asc" => tickets.OrderBy(t => t.CreatedBy?.Email).ToList(),
+                "user_desc" => tickets.OrderByDescending(t => t.CreatedBy?.FullName).ToList(),
+                "user_asc" => tickets.OrderBy(t => t.CreatedBy?.FullName).ToList(),
 
                 "date_desc" => tickets.OrderByDescending(t => t.CreatedAt).ToList(),
                 "date_asc" => tickets.OrderBy(t => t.CreatedAt).ToList(),
 
+                "deadline_desc" => tickets.OrderByDescending(t => t.Deadline).ToList(),
+                "deadline_asc" => tickets.OrderBy(t => t.Deadline).ToList(),
+
                 _ => tickets.OrderBy(t => t.TicketNumber).ToList()
             };
+
 
             return tickets;
         }
