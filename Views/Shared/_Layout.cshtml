@@ -26,10 +26,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="mainNav">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
+                    <ul class="navbar-nav flex-grow-1">                
 
                         @* Only managers see the Users page *@
                         @if (isSignedIn && isManager)
@@ -38,10 +35,7 @@
                                 <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">Users</a>
                             </li>
                         }
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                       
                     </ul>
 
                     <ul class="navbar-nav">
@@ -56,15 +50,7 @@
                                 <a class="btn btn-outline-danger btn-sm" asp-controller="Login" asp-action="Logout">Logout</a>
                             </li>
                         }
-                        else
-                        {
-                            <li class="nav-item me-2">
-                                <a class="btn btn-outline-primary btn-sm" asp-controller="Login" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-outline-secondary btn-sm" asp-controller="Login" asp-action="Register">Register</a>
-                            </li>
-                        }
+                       
                     </ul>
                 </div>
             </div>

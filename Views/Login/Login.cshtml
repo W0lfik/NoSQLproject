@@ -1,15 +1,18 @@
-﻿@{
+﻿
+
+@{
     ViewData["Title"] = "Login";
-    var err = ViewBag.Error ?? ViewBag.ErrorMessage;
+    
 }
+
 
 <div class="d-flex justify-content-center align-items-center vh-100">
     <div>
         <h4 class="text-center mb-4">Login</h4>
 
-        @if (err != null)
+        @if (ViewBag.Error != null)
         {
-            <div class="alert alert-danger" role="alert">@err</div>
+            <div class="alert alert-danger">@ViewBag.Error</div>
         }
 
         <form asp-controller="Login" asp-action="Login" method="post" class="border p-4 rounded shadow bg-light">

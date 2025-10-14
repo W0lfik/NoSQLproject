@@ -92,7 +92,7 @@ namespace NoSQLproject.Controllers
                 // Sign in with cookie authentication
                 await HttpContext.SignInAsync("CookieAuth", principal);
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Ticket");
             }
 
             ViewBag.Error = "Invalid employee number or password";
