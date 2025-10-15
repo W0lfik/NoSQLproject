@@ -1,16 +1,20 @@
-﻿using NoSQLproject.Models;
+﻿
+using NoSQLproject.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace NoSQLproject.Services.Interfaces
 {
     public interface IUserService
     {
+        // Queries
         List<User> GetAll();
-        User? GetById(string id);
-        User? GetByEmail(string email);
-        User? GetByEmployeeNumber(int employeeNumber);
+        User GetByIdOrThrow(string id);
 
-        bool Create(User userPlain);
-        bool Update(User userPlain);
-        bool Delete(string id);
+        // VM builder
+        EditUserVm BuildEditVmOrThrow(string id);
+
+        void Create(CreateUserVm vm);   
+        void Update(EditUserVm vm);   
+        void Delete(string id);
     }
 }

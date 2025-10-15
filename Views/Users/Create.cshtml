@@ -4,8 +4,13 @@
 }
 <h2>Create user</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" autocomplete="off">
     @Html.AntiForgeryToken()
+
+    <div class="alert alert-info mb-3">
+        Employee number will be generated automatically after saving.
+    </div>
+
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-2">
@@ -13,25 +18,27 @@
         <input asp-for="FullName" class="form-control" />
         <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
-    <div class="mb-2">
-        <label asp-for="EmployeeNumber" class="form-label"></label>
-        <input asp-for="EmployeeNumber" class="form-control" />
-        <span asp-validation-for="EmployeeNumber" class="text-danger"></span>
-    </div>
+
+    <!-- EmployeeNumber removed: system-assigned -->
+
     <div class="mb-2">
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="Phone" class="form-label"></label>
         <input asp-for="Phone" class="form-control" />
         <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="Location" class="form-label"></label>
         <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="TypeOfUser" class="form-label"></label>
         <select asp-for="TypeOfUser" class="form-select"
@@ -39,9 +46,10 @@
         </select>
         <span asp-validation-for="TypeOfUser" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" class="form-control" type="password" />
+        <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
@@ -49,3 +57,6 @@
     <a asp-action="Index" class="btn btn-link">Cancel</a>
 </form>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -14,6 +14,7 @@ namespace NoSQLproject.Repositories
 
         public UserRepository(IConfiguration config)
         {
+            
             _client ??= new MongoClient(config["MongoDbSettings:ConnectionString"]);
             IMongoDatabase database = _client.GetDatabase(config["MongoDbSettings:DatabaseName"]);
 

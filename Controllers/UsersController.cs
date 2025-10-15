@@ -1,169 +1,171 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NoSQLproject.Models;
 using NoSQLproject.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace NoSQLproject.Controllers
 {
-    // Only managers can access this controller (adjust policy/role as needed)
     [Authorize(Roles = "manager")]
     public class UsersController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IUserService _users;
+        private readonly ILogger<UsersController> _log;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService users, ILogger<UsersController> log)
         {
-            _userService = userService;
+            _users = users;
+            _log = log;
+        }
+
+        public IActionResult Index(string? search)
+        {
+            try
+            {
+                var users = _users.GetAll();
+
+                if (!string.IsNullOrWhiteSpace(search))
+                {
+                    if (int.TryParse(search, out int empNum))
+                        users = users.Where(u => u.EmployeeNumber == empNum).ToList();
+                    else
+                        users = users
+                            .Where(u => u.FullName.Contains(search, StringComparison.OrdinalIgnoreCase)
+                                     || u.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                }
+
+                ViewBag.Search = search; // remember search text in the view
+                return View(users);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Index failed");
+                return Problem("Failed to load users.");
+            }
         }
 
 
-
-        // Show all users in a table
-        
-        public IActionResult Index()
-        {
-            var users = _userService.GetAll();
-            return View(users);
-        }
-
-        // Show form to add a new user
-    
         [HttpGet]
-        public IActionResult Create()
-        {
-            var vm = new CreateUserVm();
-            return View(vm);
-        }
+        public IActionResult Create() => View(new CreateUserVm());
 
-       
-        // Handle form submission for creating a new user
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // Overposting protection: only bind fields that CreateUserVm should accept.
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult Create(CreateUserVm vm)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(vm);
+
+            try
             {
+                _users.Create(vm);
+                TempData["Success"] = "User created.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationException vex)
+            {
+                ModelState.AddModelError(string.Empty, vex.Message);
                 return View(vm);
             }
-
-            var newUser = new User
+            catch (Exception ex)
             {
-                FullName = vm.FullName,
-                EmployeeNumber = vm.EmployeeNumber,
-                Email = vm.Email,
-                Phone = vm.Phone,
-                Location = vm.Location ?? "",
-                TypeOfUser = vm.TypeOfUser,
-                Password = vm.Password   // service layer hashes it
-            };
-
-            bool created = _userService.Create(newUser);
-            if (!created)
-            {
-                ModelState.AddModelError("", "A user with this email or employee number already exists.");
+                _log.LogError(ex, "Create failed");
+                ModelState.AddModelError(string.Empty, "Unexpected error.");
                 return View(vm);
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
-        
-        // Show form to edit an existing user
-        
         [HttpGet]
         public IActionResult Edit(string id)
         {
-            var user = _userService.GetById(id);
-            if (user == null)
+            if (string.IsNullOrWhiteSpace(id)) return NotFound();
+
+            try
+            {
+                var vm = _users.BuildEditVmOrThrow(id);
+                return View(vm);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            var vm = new EditUserVm
+            catch (Exception ex)
             {
-                Id = user.Id,
-                FullName = user.FullName,
-                EmployeeNumber = user.EmployeeNumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Location = user.Location,
-                TypeOfUser = user.TypeOfUser
-            };
-
-            return View(vm);
+                _log.LogError(ex, "Edit GET failed for {Id}", id);
+                return Problem("Failed to load form.");
+            }
         }
 
-        
-        // Handle form submission for editing an existing user
-       
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // Overposting protection: EmployeeNumber is immutable; do not bind it from the request.
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult Edit(EditUserVm vm)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(vm);
+
+            try
             {
+                _users.Update(vm);
+                TempData["Success"] = "User updated.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationException vex)
+            {
+                ModelState.AddModelError(string.Empty, vex.Message);
                 return View(vm);
             }
-
-            var user = _userService.GetById(vm.Id);
-            if (user == null)
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            user.FullName = vm.FullName;
-            user.EmployeeNumber = vm.EmployeeNumber;
-            user.Email = vm.Email;
-            user.Phone = vm.Phone;
-            user.Location = vm.Location ?? "";
-            user.TypeOfUser = vm.TypeOfUser;
-
-            // If a new password was entered, update it (service will hash)
-            if (!string.IsNullOrWhiteSpace(vm.NewPassword))
+            catch (Exception ex)
             {
-                user.Password = vm.NewPassword;
-            }
-
-            bool updated = _userService.Update(user);
-            if (!updated)
-            {
-                ModelState.AddModelError("", "Email or employee number already exists.");
+                _log.LogError(ex, "Edit POST failed for {Id}", vm.Id);
+                ModelState.AddModelError(string.Empty, "Unexpected error.");
                 return View(vm);
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
-        // Show confirmation page before deleting a user
-      
         [HttpGet]
         public IActionResult Delete(string id)
         {
-            var user = _userService.GetById(id);
-            if (user == null)
+            if (string.IsNullOrWhiteSpace(id)) return NotFound();
+
+            try
+            {
+                var u = _users.GetByIdOrThrow(id);
+                return View(u);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            return View(user);
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Delete GET failed for {Id}", id);
+                return Problem("Failed to load confirmation.");
+            }
         }
 
-       
-        // Confirm deletion of a user
-        
-        [HttpPost]
-        [ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(string id)
         {
-            bool deleted = _userService.Delete(id);
-            if (!deleted)
+            if (string.IsNullOrWhiteSpace(id)) return NotFound();
+
+            try
+            {
+                _users.Delete(id);
+                TempData["Success"] = "User deleted.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                _log.LogError(ex, "Delete POST failed for {Id}", id);
+                return Problem("Failed to delete user.");
+            }
         }
     }
 }

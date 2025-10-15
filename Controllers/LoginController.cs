@@ -80,24 +80,31 @@ namespace NoSQLproject.Controllers
             {
                 // Create claims for authentication
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.FullName),
-                    new Claim("EmployeeNumber", user.EmployeeNumber.ToString()),
-                    new Claim(ClaimTypes.Role, user.TypeOfUser.ToString())
-                };
+        {
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim("EmployeeNumber", user.EmployeeNumber.ToString()),
+            new Claim(ClaimTypes.Role, user.TypeOfUser.ToString())
+        };
 
                 var identity = new ClaimsIdentity(claims, "CookieAuth");
                 var principal = new ClaimsPrincipal(identity);
 
-                // Sign in with cookie authentication
                 await HttpContext.SignInAsync("CookieAuth", principal);
 
+                //  Redirect based on role
+                if (user.TypeOfUser == TypeOfUser.manager)
+                {
+                    return RedirectToAction("Index", "Users");
+                }
+
+                // Default: go to Ticket Overview
                 return RedirectToAction("Index", "Ticket");
             }
 
             ViewBag.Error = "Invalid employee number or password";
             return View();
         }
+
 
         // GET: Logout
         [HttpGet]

@@ -4,9 +4,10 @@
 }
 <h2>Edit user</h2>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" autocomplete="off">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
+
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-2">
@@ -14,25 +15,34 @@
         <input asp-for="FullName" class="form-control" />
         <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
+
+    <!-- EmployeeNumber is immutable: show as read-only -->
     <div class="mb-2">
         <label asp-for="EmployeeNumber" class="form-label"></label>
-        <input asp-for="EmployeeNumber" class="form-control" />
-        <span asp-validation-for="EmployeeNumber" class="text-danger"></span>
+        <input asp-for="EmployeeNumber" class="form-control" readonly />
+        <div class="form-text text-muted">
+            Employee number is system-assigned and cannot be changed.
+        </div>
     </div>
+
     <div class="mb-2">
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="Phone" class="form-label"></label>
         <input asp-for="Phone" class="form-control" />
         <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="Location" class="form-label"></label>
         <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
     </div>
+
     <div class="mb-2">
         <label asp-for="TypeOfUser" class="form-label"></label>
         <select asp-for="TypeOfUser" class="form-select"
@@ -40,13 +50,20 @@
         </select>
         <span asp-validation-for="TypeOfUser" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="NewPassword" class="form-label">New password (optional)</label>
-        <input asp-for="NewPassword" class="form-control" type="password" />
+        <input asp-for="NewPassword" class="form-control" type="password" autocomplete="new-password" />
         <span asp-validation-for="NewPassword" class="text-danger"></span>
+        <div class="form-text text-muted">
+            Leave blank to keep the current password.
+        </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Update</button>
     <a asp-action="Index" class="btn btn-link">Cancel</a>
 </form>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
