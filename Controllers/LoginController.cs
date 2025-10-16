@@ -86,10 +86,10 @@ namespace NoSQLproject.Controllers
             var principal = _loginService.CreatePrincipal(user);
             await HttpContext.SignInAsync("CookieAuth", principal);
 
-            return user.TypeOfUser == TypeOfUser.manager
-                ? RedirectToAction("Index", "Users")
-                : RedirectToAction("Index", "Ticket");
+            // Single landing page; manager still gets the Users menu
+            return RedirectToAction("Index", "Ticket");
         }
+
 
 
 

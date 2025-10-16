@@ -23,7 +23,8 @@
             <th>Email</th>
             <th>Emp #</th>
             <th>Type</th>
-            <th></th>
+            <th>Location</th>
+            
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
                     <td>@u.Email</td>
                     <td>@u.EmployeeNumber</td>
                     <td>@u.TypeOfUser</td>
+                    <td>@u.Location</td>
                     <td>
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@u.Id">Edit</a>
                         <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@u.Id">Delete</a>
