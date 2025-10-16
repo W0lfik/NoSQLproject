@@ -16,5 +16,6 @@ namespace NoSQLproject.Services.Interfaces
         void Create(CreateUserVm vm);   
         void Update(EditUserVm vm);   
         void Delete(string id);
+        List<User> Search(string? term);
     }
 }

@@ -23,20 +23,8 @@ namespace NoSQLproject.Controllers
         {
             try
             {
-                var users = _users.GetAll();
-
-                if (!string.IsNullOrWhiteSpace(search))
-                {
-                    if (int.TryParse(search, out int empNum))
-                        users = users.Where(u => u.EmployeeNumber == empNum).ToList();
-                    else
-                        users = users
-                            .Where(u => u.FullName.Contains(search, StringComparison.OrdinalIgnoreCase)
-                                     || u.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
-                }
-
-                ViewBag.Search = search; // remember search text in the view
+                var users = _users.Search(search);
+                ViewBag.Search = search;
                 return View(users);
             }
             catch (Exception ex)

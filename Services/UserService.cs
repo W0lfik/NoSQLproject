@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using MongoDB.Driver;
 using NoSQLproject.Models;
@@ -16,12 +15,8 @@ namespace NoSQLproject.Services
 
         public List<User> GetAll() => _repo.GetAllUsers();
 
-        public User GetByIdOrThrow(string id)
-        {
-            var u = _repo.GetById(id);
-            if (u == null) throw new KeyNotFoundException("User not found.");
-            return u;
-        }
+        public User GetByIdOrThrow(string id) =>
+            _repo.GetById(id) ?? throw new KeyNotFoundException("User not found.");
 
         public EditUserVm BuildEditVmOrThrow(string id)
         {
@@ -30,7 +25,7 @@ namespace NoSQLproject.Services
             {
                 Id = u.Id,
                 FullName = u.FullName,
-                EmployeeNumber = u.EmployeeNumber, // display-only in UI
+                EmployeeNumber = u.EmployeeNumber,
                 Email = u.Email,
                 Phone = u.Phone,
                 Location = u.Location,
@@ -40,63 +35,19 @@ namespace NoSQLproject.Services
 
         public void Create(CreateUserVm vm)
         {
-            if (_repo.GetByEmail(vm.Email) != null)
-                throw new ValidationException("Email already exists.");
+            ValidateEmailUnique(vm.Email);
 
-            var user = new User
-            {
-                FullName = (vm.FullName ?? string.Empty).Trim(),
-                Email = (vm.Email ?? string.Empty).Trim(),
-                Phone = vm.Phone?.Trim() ?? string.Empty,
-                Location = vm.Location ?? string.Empty,
-                TypeOfUser = vm.TypeOfUser,
-                // Your model uses `Password` (not PasswordHash), so hash into that field:
-                Password = BCrypt.Net.BCrypt.HashPassword(vm.Password ?? string.Empty)
-            };
-
-            // Generate a unique 6-digit EmployeeNumber with retry-on-duplicate
-            const int minInclusive = 100000;
-            const int maxExclusive = 1_000_000; // 6 digits
-            const int maxRetries = 10;
-
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
-            {
-                user.EmployeeNumber = RandomNumberGenerator.GetInt32(minInclusive, maxExclusive);
-
-                try
-                {
-                    _repo.CreateUser(user);
-                    return; // success
-                }
-                catch (MongoWriteException mwx) when (mwx.WriteError?.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    // Collision on unique index (EmployeeNumber). Try again.
-                    if (attempt == maxRetries)
-                        throw new ValidationException("Could not allocate a unique employee number. Please retry.");
-                }
-            }
+            var user = CreateUserFromVm(vm);
+            AssignUniqueEmployeeNumber(user);
+            _repo.CreateUser(user);
         }
 
         public void Update(EditUserVm vm)
         {
-            var existing = _repo.GetById(vm.Id);
-            if (existing == null) throw new KeyNotFoundException("User not found.");
+            var existing = GetByIdOrThrow(vm.Id);
+            ValidateEmailUnique(vm.Email, vm.Id);
 
-            // Enforce unique email (excluding this user)
-            var byEmail = _repo.GetByEmail(vm.Email);
-            if (byEmail != null && byEmail.Id != vm.Id)
-                throw new ValidationException("Email already exists.");
-
-            // EmployeeNumber is immutable: ignore any incoming value from the VM
-            existing.FullName = (vm.FullName ?? string.Empty).Trim();
-            existing.Email = (vm.Email ?? string.Empty).Trim();
-            existing.Phone = vm.Phone?.Trim() ?? string.Empty;
-            existing.Location = vm.Location ?? string.Empty;
-            existing.TypeOfUser = vm.TypeOfUser;
-
-            if (!string.IsNullOrWhiteSpace(vm.NewPassword))
-                existing.Password = BCrypt.Net.BCrypt.HashPassword(vm.NewPassword);
-
+            UpdateUserFields(existing, vm);
             _repo.UpdateUser(existing);
         }
 
@@ -105,6 +56,77 @@ namespace NoSQLproject.Services
             var u = _repo.GetById(id);
             if (u == null) throw new KeyNotFoundException("User not found.");
             _repo.DeleteUser(id);
+        }
+
+        // ---------- Private helpers ----------
+
+        private void ValidateEmailUnique(string email, string? excludeId = null)
+        {
+            var existing = _repo.GetByEmail(email);
+            if (existing != null && existing.Id != excludeId)
+                throw new ValidationException("Email already exists.");
+        }
+
+        private User CreateUserFromVm(CreateUserVm vm) => new()
+        {
+            FullName = vm.FullName?.Trim() ?? string.Empty,
+            Email = vm.Email?.Trim() ?? string.Empty,
+            Phone = vm.Phone?.Trim() ?? string.Empty,
+            Location = vm.Location ?? string.Empty,
+            TypeOfUser = vm.TypeOfUser,
+            Password = BCrypt.Net.BCrypt.HashPassword(vm.Password ?? string.Empty)
+        };
+
+        private static void UpdateUserFields(User existing, EditUserVm vm)
+        {
+            existing.FullName = vm.FullName?.Trim() ?? string.Empty;
+            existing.Email = vm.Email?.Trim() ?? string.Empty;
+            existing.Phone = vm.Phone?.Trim() ?? string.Empty;
+            existing.Location = vm.Location ?? string.Empty;
+            existing.TypeOfUser = vm.TypeOfUser;
+
+            if (!string.IsNullOrWhiteSpace(vm.NewPassword))
+                existing.Password = BCrypt.Net.BCrypt.HashPassword(vm.NewPassword);
+        }
+
+        public List<User> Search(string? term)
+        {
+            var users = GetAll(); // already returns projected/safe fields
+
+            if (string.IsNullOrWhiteSpace(term))
+                return users;
+
+            term = term.Trim();
+
+            if (int.TryParse(term, out var empNo))
+                return users.Where(u => u.EmployeeNumber == empNo).ToList();
+
+            return users.Where(u =>
+                    (!string.IsNullOrEmpty(u.FullName) && u.FullName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(u.Email) && u.Email.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+        }
+
+
+        private void AssignUniqueEmployeeNumber(User user)
+        {
+            const int minInclusive = 100000;
+            const int maxExclusive = 1_000_000;
+            const int maxRetries = 10;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                user.EmployeeNumber = RandomNumberGenerator.GetInt32(minInclusive, maxExclusive);
+                try
+                {
+                    if (_repo.GetByEmployeeNumber(user.EmployeeNumber) == null) return;
+                }
+                catch (MongoWriteException mwx) when (mwx.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+                {
+                    if (attempt == maxRetries)
+                        throw new ValidationException("Could not allocate unique employee number.");
+                }
+            }
         }
     }
 }
