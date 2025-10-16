@@ -1,41 +1,52 @@
-﻿using MongoDB.Driver;
+﻿using System.Security.Claims;
 using NoSQLproject.Models;
 using NoSQLproject.Repositories.Interfaces;
 using NoSQLproject.Services.Interfaces;
-
 
 namespace NoSQLproject.Services
 {
     public class LoginService : ILoginService
     {
-        private IUserRepository _userRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserRepository _users;
 
-        public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public LoginService(IUserRepository users)
         {
-            _userRepository = userRepository;
-            _httpContextAccessor = httpContextAccessor;
+            _users = users;
         }
 
-        public void Register(User user)
+        // Create a user (expects password already hashed by caller;
+        // move the hash here if you prefer centralizing it)
+        public void Register(User user) => _users.CreateUser(user);
+
+        // Simple queries
+        public List<User> GetAllUsers() => _users.GetAllUsers();
+
+        public bool EmployeeNumberExists(int employeeNumber) =>
+            _users.GetByEmployeeNumber(employeeNumber) != null;
+
+        // ---- Auth helpers for a thin controller ----
+
+        // Returns the user if credentials are valid; otherwise null
+        public User? ValidateCredentials(int employeeNumber, string password)
         {
-            _userRepository.CreateUser(user);
+            var user = _users.GetByEmployeeNumber(employeeNumber);
+            if (user == null) return null;
+
+            return BCrypt.Net.BCrypt.Verify(password, user.Password) ? user : null;
         }
 
-        public List<User> GetAllUsers()
+        // Build the ClaimsPrincipal for cookie auth
+        public ClaimsPrincipal CreatePrincipal(User user)
         {
-            return  _userRepository.GetAllUsers();
-        }
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim("EmployeeNumber", user.EmployeeNumber.ToString()),
+                new Claim(ClaimTypes.Role, user.TypeOfUser.ToString())
+            };
 
-        public bool Login(int employeeNumber, string password)
-        {
-            var user = _userRepository.GetByEmployeeNumber(employeeNumber);
-            return user != null && BCrypt.Net.BCrypt.Verify(password, user.Password);
-        }
-
-        public bool EmployeeNumberExists(int employeeNumber)
-        {
-            return _userRepository.GetByEmployeeNumber(employeeNumber) != null;
+            var identity = new ClaimsIdentity(claims, "CookieAuth");
+            return new ClaimsPrincipal(identity);
         }
     }
 }

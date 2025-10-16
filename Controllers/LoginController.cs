@@ -76,37 +76,21 @@ namespace NoSQLproject.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(int employeeNumber, string password)
         {
-            var user = _loginService.GetAllUsers()
-                .FirstOrDefault(u => u.EmployeeNumber == employeeNumber);
-
-            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
+            var user = _loginService.ValidateCredentials(employeeNumber, password);
+            if (user == null)
             {
-                // Create claims for authentication
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.FullName),
-            new Claim("EmployeeNumber", user.EmployeeNumber.ToString()),
-            new Claim(ClaimTypes.Role, user.TypeOfUser.ToString())
-        };
-
-                var identity = new ClaimsIdentity(claims, "CookieAuth");
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync("CookieAuth", principal);
-
-                //  Redirect based on role
-                if (user.TypeOfUser == TypeOfUser.manager)
-                {
-                    return RedirectToAction("Index", "Users");
-                }
-
-                // Default: go to Ticket Overview
-                return RedirectToAction("Index", "Ticket");
+                ViewBag.Error = "Invalid employee number or password";
+                return View();
             }
 
-            ViewBag.Error = "Invalid employee number or password";
-            return View();
+            var principal = _loginService.CreatePrincipal(user);
+            await HttpContext.SignInAsync("CookieAuth", principal);
+
+            return user.TypeOfUser == TypeOfUser.manager
+                ? RedirectToAction("Index", "Users")
+                : RedirectToAction("Index", "Ticket");
         }
+
 
 
         // GET: Logout
