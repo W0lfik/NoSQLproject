@@ -4,17 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 using NoSQLproject.Extensions;
 using NoSQLproject.Models;
 using NoSQLproject.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+
 
 namespace NoSQLproject.Controllers
 {
     public class LoginController : Controller
     {
         private readonly ILoginService _loginService;
-
-        public LoginController(ILoginService loginService)
+        private readonly IPasswordResetService _resetService;
+        public LoginController(ILoginService loginService, IPasswordResetService resetService)
         {
-            _loginService = loginService;
+            _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
+            _resetService = resetService ?? throw new ArgumentNullException(nameof(resetService));
         }
 
         [HttpPost]
@@ -113,5 +116,72 @@ namespace NoSQLproject.Controllers
             await HttpContext.SignOutAsync("CookieAuth");
             return RedirectToAction("Login");
         }
+        ////////////////////////////////////////////////////////////////////////
+        [HttpGet]
+        public IActionResult ForgotPassword() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPassword(string emailOrEmployeeNumber)
+        {
+            // Always show the same confirmation to avoid user enumeration
+            _resetService.RequestPasswordReset(emailOrEmployeeNumber);
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation() => View();
+
+        // --- Reset Password via emailed link ---
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return BadRequest();
+            ViewBag.Token = token;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ResetPassword(string token, string newPassword, string confirmPassword)
+        {
+            if (string.IsNullOrWhiteSpace(token)) return BadRequest();
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            {
+                ViewBag.Token = token;
+                ViewBag.Error = "Password must be at least 6 characters.";
+                return View();
+            }
+            if (newPassword != confirmPassword)
+            {
+                ViewBag.Token = token;
+                ViewBag.Error = "Passwords do not match.";
+                return View();
+            }
+
+            try
+            {
+                _resetService.ResetPassword(token, newPassword);
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
+            catch (ValidationException vex)
+            {
+                ViewBag.Token = token;
+                ViewBag.Error = vex.Message;
+                return View();
+            }
+            catch (Exception)
+            {
+                ViewBag.Token = token;
+                ViewBag.Error = "Unexpected error. Please try again.";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation() => View();
     }
 }
+
