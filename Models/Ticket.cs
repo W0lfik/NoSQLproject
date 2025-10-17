@@ -22,10 +22,10 @@ public class Ticket
     
     [BsonElement("priority")]
     [BsonRepresentation(BsonType.String)] 
-    public Priority Priority { get; set; }
+    public Priority? Priority { get; set; }
     
     [BsonElement("deadline")]
-    public DateTime Deadline { get; set; }
+    public DateTime? Deadline { get; set; }
     
     [BsonElement("description")]
     public string Description { get; set; }
@@ -38,7 +38,7 @@ public class Ticket
     public string Title { get; set; }
     
     [BsonElement("resolvedAt")]
-    public DateTime ResolvedAt { get; set; }
+    public DateTime? ResolvedAt { get; set; }
     
     [BsonElement("createdBy")]
     public User CreatedBy { get; set; }

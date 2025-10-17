@@ -38,6 +38,11 @@
                     
                     <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
                     <dd class="col-sm-8">
+                        @{
+                            if (Model.Priority == null)
+                            {
+                                <span class="badge bg-warning text-dark">To be assigned</span>
+                            }}
                         <span class="badge bg-warning text-dark">@Model.Priority</span>
                     </dd>
 
@@ -54,17 +59,17 @@
                     <dt class="col-sm-4 text-muted fw-bold">State</dt>
                     <dd class="col-sm-8">
                         @{
-                            string stateColor = "bg-success";
-                            switch (@Model.State)
-                            {
-                                case State.open:
-                                    stateColor = "bg-danger";
-                                    break;
-                                case State.inProgress:
-                                    stateColor = "bg-warning";
-                                    break;
-                            }
-                        }
+string stateColor = "bg-success";
+switch (@Model.State)
+{
+    case State.open:
+        stateColor = "bg-danger";
+        break;
+    case State.inProgress:
+        stateColor = "bg-warning";
+        break;
+}
+}
                         <span class="badge @stateColor">@Model.State</span>
                     </dd>
 
@@ -72,12 +77,16 @@
                     <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
-                    <dd class="col-sm-8 text-danger">@Model.Deadline.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                    <dd class="col-sm-8 text-danger"> @(Model.Deadline.HasValue
+                                                          ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                                          : "—")</dd>
 
                     @if (Model.ResolvedAt != default(DateTime))
                     {
                         <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
-                        <dd class="col-sm-8 text-success">@Model.ResolvedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                        <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
+                                                              ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                                              : "—")</dd>
                     }
                 </dl>
             </div>
