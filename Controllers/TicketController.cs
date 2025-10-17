@@ -110,6 +110,36 @@ public class TicketController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
+    public IActionResult Manage(int ticketNumber)
+    {
+        CreateTicketViewModel vm = _ticketService.BuildVmForEdit(ticketNumber);
+        return vm is null ? NotFound() : View(vm);
+    }
+    
+    [HttpPost]
+    public IActionResult Manage(CreateTicketViewModel vm)
+    {
+        // 1. Check if the model state is valid
+        if (!ModelState.IsValid)
+        {
+            var tempVm = _ticketService.BuildVmForEdit(vm.Ticket.TicketNumber);
+            if (tempVm != null)
+            {
+                // Transfer back the user input and return the view
+                tempVm.Ticket = vm.Ticket;
+                tempVm.CreatedByUserId = vm.CreatedByUserId;
+                tempVm.HandledByUserIds = vm.HandledByUserIds;
+                return View(tempVm);
+            }
+            return View(vm); 
+        }
+       
+        _ticketService.UpdateTicketFromVm(vm);
+        
+        // 3. Redirect to the Details view after a successful save
+        return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
+    }
 
 
 }

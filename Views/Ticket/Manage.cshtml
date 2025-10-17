@@ -1,0 +1,207 @@
+﻿@model NoSQLproject.Models.CreateTicketViewModel
+@{
+    ViewData["Title"] = "Manage Ticket";
+    // Define the list of priorities for the buttons
+    var priorities = Enum.GetNames(typeof(NoSQLproject.Models.Priority));
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2>Ticket @Model.Ticket.TicketNumber — @Model.Ticket.Title</h2>
+        <div class="text-muted small">Id: @Model.Ticket.Id</div>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <div style="width: 100px;">
+            <a asp-action="Manage" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-warning w-100 text-dark">
+                Manage
+            </a>
+        </div>
+        <div style="width: 100px;">
+            <a asp-action="Edit" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-primary w-100">
+                Edit
+            </a>
+        </div>
+        <div style="width: 100px;">
+            <form asp-action="Delete" asp-route-ticketNumber="@Model.Ticket.TicketNumber" method="post" class="d-inline w-100">
+                <button type="submit" class="btn btn-danger w-100"
+                        onclick="return confirm('Delete this ticket?');">
+                    Delete
+                </button>
+            </form>
+        </div>
+        <div style="width: 100px;">
+            <a asp-action="Details" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-secondary w-100">Back</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        
+        <form asp-action="Manage" method="post" id="ticket-manage-form" class="mb-0">
+            <input type="hidden" asp-for="Ticket.Id" />
+            <input type="hidden" asp-for="Ticket.TicketNumber" />
+            <input type="hidden" asp-for="Ticket.Title" />
+            <input type="hidden" asp-for="Ticket.Description" />
+            <input type="hidden" asp-for="Ticket.IncidentType" />
+            <input type="hidden" asp-for="Ticket.CreatedAt" />
+            <input type="hidden" asp-for="Ticket.CreatedBy" />
+            <input type="hidden" asp-for="CreatedByUserId" />
+            
+            <input type="hidden" asp-for="Ticket.Priority" id="HiddenPriority" />
+
+            <div class="row">
+                <div class="col-md-6 border-end">
+                    <dl class="row">
+                        
+                        <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
+                        <dd class="col-sm-8">
+                            <div class="btn-group w-100" role="group" aria-label="Ticket Priority">
+                                @foreach (var p in priorities)
+                                {
+                                    // Use a data attribute to store the enum value
+                                    string priorityValue = p;
+                                    string buttonClass = "";
+                                    string dataPriorityValue = ((int)Enum.Parse<NoSQLproject.Models.Priority>(p)).ToString();
+                                    
+                                    // Determine button color
+                                    switch (p)
+                                    {
+                                        case "P1": buttonClass = "btn-danger"; break;
+                                        case "P2": buttonClass = "btn-warning text-dark"; break;
+                                        case "P3": buttonClass = "btn-info text-dark"; break;
+                                        default: buttonClass = "btn-secondary"; break;
+                                    }
+                                    
+                                    <button type="button" 
+                                            class="btn @buttonClass btn-sm priority-btn @(Model.Ticket.Priority.ToString() == p ? "active" : "")"
+                                            data-priority-name="@p"
+                                            data-priority-value="@dataPriorityValue">
+                                        @p
+                                    </button>
+                                }
+                            </div>
+                        </dd>
+                        
+                        <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
+                        <dd class="col-sm-8">@Model.Ticket.TicketNumber</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold">Incident Type</dt>
+                        <dd class="col-sm-8">@Model.Ticket.IncidentType</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold">Description</dt>
+                        <dd class="col-sm-8 text-wrap">@Model.Ticket.Description</dd>
+
+                    </dl>
+                </div>
+
+                <div class="col-md-6 ps-4">
+                    <dl class="row">
+
+                        <dt class="col-sm-4 text-muted fw-bold">State</dt>
+                        <dd class="col-sm-8">
+                            <select asp-for="Ticket.State" class="form-select form-select-sm"
+                                    asp-items="Html.GetEnumSelectList<NoSQLproject.Models.State>()"></select>
+                            <span asp-validation-for="Ticket.State" class="text-danger small"></span>
+                        </dd>
+                        
+                        <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
+                        <dd class="col-sm-8">@Model.Ticket.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
+                        <dd class="col-sm-8">
+                            <input asp-for="Ticket.Deadline" type="datetime-local" class="form-control form-control-sm"/>
+                            <span asp-validation-for="Ticket.Deadline" class="text-danger small"></span>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
+                        <dd class="col-sm-8">
+                            <input asp-for="Ticket.ResolvedAt" type="datetime-local" class="form-control form-control-sm"/>
+                            <span asp-validation-for="Ticket.ResolvedAt" class="text-danger small"></span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            
+            @if (Model.HandledByUserIds != null)
+            {
+                @for (int i = 0; i < Model.HandledByUserIds.Count; i++)
+                {
+                    <input type="hidden" asp-for="HandledByUserIds[i]" />
+                }
+            }
+        </form>
+    </div>
+</div>
+
+<h4 class="mt-4">Created By</h4>
+@* You would place your existing Created By display card/content here *@
+@if (Model.Ticket.CreatedBy is not null)
+{
+    @* Example of where your existing card/content for CreatedBy would go *@
+}
+else
+{
+    <p class="text-muted">No creator assigned.</p>
+}
+
+
+<h4 class="mt-4">Handled By</h4>
+<div class="card">
+    <div class="card-body">
+        <label class="form-label fw-bold">Assign Handlers</label>
+        <select form="ticket-manage-form" asp-for="HandledByUserIds" asp-items="Model.UsersSelect" class="form-select" multiple size="6"></select>
+        <div class="form-text">Hold Ctrl/Cmd to select multiple handlers.</div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-3 mt-4">
+    <a asp-action="Details" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" form="ticket-manage-form" class="btn btn-success">
+        Save Management Changes
+    </button>
+</div>
+
+@section Scripts { 
+    <partial name="_ValidationScriptsPartial" /> 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hiddenPriorityInput = document.getElementById('HiddenPriority');
+            const priorityButtons = document.querySelectorAll('.priority-btn');
+
+            // Initialize the hidden field with the current value
+            // Note: If you use the Enum value (int), you need to convert it here. 
+            // The Razor code below sets the name (string) by default for the hidden input.
+            // Let's ensure the default active button is set based on the current model value.
+            if (hiddenPriorityInput && '@Model.Ticket.Priority' !== '') {
+                // If the model priority is set, ensure the hidden field reflects the string name
+                hiddenPriorityInput.value = '@Model.Ticket.Priority'; 
+            }
+            
+            // Add click listener to all buttons
+            priorityButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove 'active' class from all buttons
+                    priorityButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add 'active' class to the clicked button
+                    this.classList.add('active');
+                    
+                    // Update the hidden input field with the priority name (e.g., "P1")
+                    hiddenPriorityInput.value = this.dataset.priorityName;
+                });
+            });
+
+            // Set the initial active state based on the current model value
+            // This ensures the button is highlighted on page load
+            if ('@Model.Ticket.Priority' !== '') {
+                const currentPriority = '@Model.Ticket.Priority';
+                const activeBtn = document.querySelector(`.priority-btn[data-priority-name="${currentPriority}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
+                }
+            }
+        });
+    </script>
+}

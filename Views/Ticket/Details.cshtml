@@ -10,7 +10,11 @@
     </div>
 
     <div class="mb-3 d-flex gap-2">
-        <div><a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary w-100">
+        <a asp-action="Manage" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-warning text-white">
+            Manage
+        </a>
+        <div>
+            <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary w-100">
                 Edit
             </a>
         </div>
