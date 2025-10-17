@@ -48,6 +48,7 @@ public class TicketRepository : ITicketRepository
     {
         // 1) server-side defaults
         ticket.CreatedAt = DateTime.UtcNow;
+        ticket.State = State.open;
         ticket.Deadline = null;
         ticket.ResolvedAt = null;
         ticket.HandledBy = new List<User>();

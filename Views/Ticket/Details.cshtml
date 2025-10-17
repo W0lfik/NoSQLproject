@@ -1,54 +1,56 @@
-@model NoSQLproject.Models.Ticket
+@model Ticket
 @{
     ViewData["Title"] = "Ticket Details";
 }
-<link rel="stylesheet" href="~/css/ticket.css" />
+<link rel="stylesheet" href="~/css/ticket.css"/>
 <div class="d-flex justify-content-between align-items-end">
     <div>
-<h2>Ticket @Model.TicketNumber — @Model.Title</h2>
-<h6 class="text-secondary">Id: @Model.Id</h6>
+        <h2>Ticket @Model.TicketNumber — @Model.Title</h2>
+        <h6 class="text-secondary">Id: @Model.Id</h6>
     </div>
 
     <div class="mb-3 d-flex gap-2">
-        <div> <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary w-100">
+        <div><a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary w-100">
                 Edit
             </a>
         </div>
 
-        <div > <form asp-action="Delete" asp-route-ticketNumber="@Model.TicketNumber" method="post" class="d-inline w-100">
+        <div>
+            <form asp-action="Delete" asp-route-ticketNumber="@Model.TicketNumber" method="post" class="d-inline w-100">
                 <button type="submit" class="btn btn-danger w-100"
                         onclick="return confirm('Delete this ticket?');">
                     Delete
-                </button>   
+                </button>
             </form>
         </div>
 
-        <div> <a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+        <div><a asp-action="Index" class="btn btn-secondary w-100">Back</a>
         </div>
     </div>
 </div>
 <div class="card">
     <div class="card-body">
-        
+
         <div class="row">
             <div class="col-md-6 border-end">
                 <dl class="row">
                     <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
                     <dd class="col-sm-8">@Model.TicketNumber</dd>
-                    
+
                     <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
                     <dd class="col-sm-8">
                         @{
                             if (Model.Priority == null)
                             {
                                 <span class="badge bg-warning text-dark">To be assigned</span>
-                            }}
+                            }
+                        }
                         <span class="badge bg-warning text-dark">@Model.Priority</span>
                     </dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Incident Type</dt>
                     <dd class="col-sm-8">@Model.IncidentType</dd>
-                    
+
                     <dt class="col-sm-4 text-muted fw-bold">Description</dt>
                     <dd class="col-sm-8">@Model.Description</dd>
                 </dl>
@@ -59,17 +61,17 @@
                     <dt class="col-sm-4 text-muted fw-bold">State</dt>
                     <dd class="col-sm-8">
                         @{
-string stateColor = "bg-success";
-switch (@Model.State)
-{
-    case State.open:
-        stateColor = "bg-danger";
-        break;
-    case State.inProgress:
-        stateColor = "bg-warning";
-        break;
-}
-}
+                            string stateColor = "bg-success";
+                            switch (Model.State)
+                            {
+                                case State.open:
+                                    stateColor = "bg-danger";
+                                    break;
+                                case State.inProgress:
+                                    stateColor = "bg-warning";
+                                    break;
+                            }
+                        }
                         <span class="badge @stateColor">@Model.State</span>
                     </dd>
 
@@ -78,15 +80,15 @@ switch (@Model.State)
 
                     <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
                     <dd class="col-sm-8 text-danger"> @(Model.Deadline.HasValue
-                                                          ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                                          : "—")</dd>
+                            ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            : "—")</dd>
 
                     @if (Model.ResolvedAt != default(DateTime))
                     {
                         <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
                         <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
-                                                              ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                                              : "—")</dd>
+                                ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                : "—")</dd>
                     }
                 </dl>
             </div>
@@ -98,15 +100,17 @@ switch (@Model.State)
                 <div class="card-body p-0 ">
                     <div class="d-flex align-items-center gap-sm-2">
                         <div class="fw-semibold">@Model.CreatedBy.FullName</div>
-                        <div class="text-muted small">@Model.CreatedBy.EmployeeNumber | @Model.CreatedBy.TypeOfUser</div>
-                      
+                        <div
+                            class="text-muted small">@Model.CreatedBy.EmployeeNumber | @Model.CreatedBy.TypeOfUser</div>
+
                     </div>
 
                     <div class="mt-2 d-flex align-items-center gap-2 text-muted">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
                             <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
-                            <path d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
+                            <path
+                                d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
                         </svg>
 
                         <a class="text-muted text-decoration-none"
@@ -124,29 +128,30 @@ switch (@Model.State)
         @if (Model.HandledBy != null && Model.HandledBy.Any())
         {
             <div class="d-flex gap-sm-3">
-            @foreach (var user in Model.HandledBy)
-            {
-                <div class="card border-0 mb-3 card-fit card-strong" style="border-radius: 12px;">
-                    <div class="card-body p-0 ">
-                        <div class="d-flex align-items-center gap-sm-2">
-                            <div class="fw-semibold">@user.FullName</div>
-                            <div class="text-muted small">@user.EmployeeNumber | @user.TypeOfUser</div>
-                      
-                        </div>
+                @foreach (var user in Model.HandledBy)
+                {
+                    <div class="card border-0 mb-3 card-fit card-strong" style="border-radius: 12px;">
+                        <div class="card-body p-0 ">
+                            <div class="d-flex align-items-center gap-sm-2">
+                                <div class="fw-semibold">@user.FullName</div>
+                                <div class="text-muted small">@user.EmployeeNumber | @user.TypeOfUser</div>
 
-                        <div class="mt-2 d-flex align-items-center gap-2 text-muted">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
-                                <path d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
-                            </svg>
+                            </div>
 
-                            <a class="text-muted text-decoration-none"
-                               href="mailto:@user.Email">@user.Email</a>
+                            <div class="mt-2 d-flex align-items-center gap-2 text-muted">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
+                                    <path
+                                        d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
+                                </svg>
+
+                                <a class="text-muted text-decoration-none"
+                                   href="mailto:@user.Email">@user.Email</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
             </div>
         }
         else

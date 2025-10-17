@@ -2,6 +2,7 @@
 using NoSQLproject.Models;
 using NoSQLproject.Repositories.Interfaces;
 using NoSQLproject.Services.Interfaces;
+using System.Security.Claims;
 
 namespace NoSQLproject.Services
 {
@@ -9,11 +10,13 @@ namespace NoSQLproject.Services
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository)
+        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository,  IHttpContextAccessor httpContextAccessor)
         {
             _ticketRepository = ticketRepository;
             _userRepository = userRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<Ticket> GetFilteredAndSortedTickets(string searchEmail, string sortOrder)
@@ -71,12 +74,13 @@ namespace NoSQLproject.Services
 
         public void CreateTicketFromVm(CreateTicketViewModel vm)
         {
-            Ticket ticket = vm.Ticket ?? new Ticket();
+            Ticket ticket = vm.Ticket;
             ApplyPeopleFromVm(ticket, vm);
 
-            // defaults
-            ticket.State = State.open;
-            ticket.CreatedAt = DateTime.UtcNow;
+            // current user as CreatedBy
+            ticket.CreatedBy = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "EmployeeNumber") is Claim empNumClaim
+                ? _userRepository.GetByEmployeeNumber(int.Parse(empNumClaim.Value))
+                : null;
 
             _ticketRepository.CreateTicket(ticket); // your repo does auto-numbering
         }

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NoSQLproject.Models;
@@ -75,6 +76,9 @@ public class TicketController : Controller
     public IActionResult Create(CreateTicketViewModel vm)
     {
         if (!ModelState.IsValid) return View(_ticketService.BuildVmForCreate()); // or return View(vm) with repopulated UsersSelect
+        
+        
+        
         _ticketService.CreateTicketFromVm(vm);
         return RedirectToAction(nameof(Index));
     }
