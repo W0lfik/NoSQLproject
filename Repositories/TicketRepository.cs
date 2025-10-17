@@ -48,16 +48,15 @@ public class TicketRepository : ITicketRepository
     {
         // 1) server-side defaults
         ticket.CreatedAt = DateTime.UtcNow;
-        ticket.HandledBy = new List<User>();
+        ticket.State = State.open;
+        ticket.Deadline = null;
+        ticket.ResolvedAt = null;
+        ticket.HandledBy = new List<UserInTicket>();
 
         // 2) assign TicketNumber if missing/zero
         if (ticket.TicketNumber <= 0)
         {
-            var last = _ticket.Find(FilterDefinition<Ticket>.Empty)
-                .SortByDescending(t => t.TicketNumber)
-                .Limit(1)
-                .FirstOrDefault();
-            ticket.TicketNumber = (last?.TicketNumber ?? 0) + 1;
+            ticket.TicketNumber = AutoNumber();
         }
 
         // 3) insert; retry once if dup (race)
@@ -69,11 +68,7 @@ public class TicketRepository : ITicketRepository
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
             // someone inserted the same number just before us → recompute and retry once
-            var last = _ticket.Find(FilterDefinition<Ticket>.Empty)
-                .SortByDescending(t => t.TicketNumber)
-                .Limit(1)
-                .FirstOrDefault();
-            ticket.TicketNumber = (last?.TicketNumber ?? 0) + 1;
+            ticket.TicketNumber = AutoNumber();
 
             _ticket.InsertOne(ticket);
             Console.WriteLine("Insert successful after retry!");
@@ -94,4 +89,15 @@ public class TicketRepository : ITicketRepository
     {
         return _ticket.Find(t => t.Id == id).FirstOrDefault();
     }
+
+    private int AutoNumber()
+    {
+        var last = _ticket.Find(FilterDefinition<Ticket>.Empty)
+            .SortByDescending(t => t.TicketNumber)
+            .Limit(1)
+            .FirstOrDefault();
+        
+        return (last?.TicketNumber ?? 0) + 1;
+    }
+    
 }

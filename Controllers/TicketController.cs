@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NoSQLproject.Models;
@@ -69,139 +70,76 @@ public class TicketController : Controller
 
 
     [HttpGet]
-    public IActionResult Create()
-    {
-        List<User> users = _userRepository.GetAllUsers();
-        
-        var vm = new CreateTicketViewModel
-        {
-            UsersSelect = users.Select(user => new SelectListItem
-            {
-                Value = user.Id,
-                Text  = $"{user.FullName} ({user.EmployeeNumber})"
-            })
-        };
-        return View(vm);
-    }
-    
+    public IActionResult Create() => View(_ticketService.BuildVmForCreate());
+
     [HttpPost]
     public IActionResult Create(CreateTicketViewModel vm)
     {
-        Console.WriteLine("POST Create() called");
-
-        if (!ModelState.IsValid)
-        {
-            // re-fill dropdowns on validation error
-            var users = _userRepository.GetAllUsers();
-            vm.UsersSelect = users.Select(u => new SelectListItem { Value = u.Id, Text = $"{u.FullName} ({u.EmployeeNumber})" });
-            return View(vm);
-        }
-
-        var allUsers = _userRepository.GetAllUsers();
-
-        // CreatedBy (optional)
-        if (!string.IsNullOrWhiteSpace(vm.CreatedByUserId))
-            vm.Ticket.CreatedBy = allUsers.FirstOrDefault(u => u.Id == vm.CreatedByUserId);
-
-        // HandledBy (multi; can be empty)
-        vm.Ticket.HandledBy = (vm.HandledByUserIds ?? new List<string>())
-            .Select(id => allUsers.FirstOrDefault(u => u.Id == id))
-            .Where(u => u != null)
-            .ToList()!;
-
-        // defaults
-        vm.Ticket.State = State.open;
-        vm.Ticket.CreatedAt = DateTime.UtcNow;
+        if (!ModelState.IsValid) return View(_ticketService.BuildVmForCreate()); // or return View(vm) with repopulated UsersSelect
         
-        try
-        {
-            _ticketRepository.CreateTicket(vm.Ticket);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Ticket creation failed: "+e);
-            throw;
-        }
-        Console.WriteLine("Ticket inserted");
-        
+        _ticketService.CreateTicketFromVm(vm);
         return RedirectToAction(nameof(Index));
     }
-    
+
     [HttpGet("Ticket/Details/{ticketNumber:int}")]
     public IActionResult Details(int ticketNumber)
     {
-        var ticket = _ticketRepository.GetTicketByNumber(ticketNumber);
-        if (ticket is null) return NotFound();
-        return View(ticket); 
+        Ticket ticket = _ticketService.GetByTicketNumber(ticketNumber);
+        return ticket is null ? NotFound() : View(ticket);
+    }
+
+    [HttpGet("Ticket/Edit/{ticketNumber:int}")]
+    public IActionResult Edit(int ticketNumber)
+    {
+        CreateTicketViewModel vm = _ticketService.BuildVmForEdit(ticketNumber);
+        return vm is null ? NotFound() : View(vm);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(CreateTicketViewModel vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+        _ticketService.UpdateTicketFromVm(vm);
+        return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
+    }
+
+    [HttpPost("Ticket/Delete/{ticketNumber:int}")]
+    public IActionResult Delete(int ticketNumber)
+    {
+        _ticketService.DeleteByTicketNumber(ticketNumber);
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult Manage(int ticketNumber)
+    {
+        CreateTicketViewModel vm = _ticketService.BuildVmForEdit(ticketNumber);
+        return vm is null ? NotFound() : View(vm);
     }
     
-    // GET: /Ticket/Edit/400
-[HttpGet("Ticket/Edit/{ticketNumber:int}")]
-public IActionResult Edit(int ticketNumber)
-{
-    var ticket = _ticketRepository.GetTicketByNumber(ticketNumber);
-    if (ticket is null) return NotFound();
-
-    // load users for dropdowns
-    var users = _userRepository.GetAllUsers();
-    var vm = new CreateTicketViewModel
+    [HttpPost]
+    public IActionResult Manage(CreateTicketViewModel vm)
     {
-        Ticket = ticket,
-        CreatedByUserId = ticket.CreatedBy?.Id,
-        HandledByUserIds = ticket.HandledBy?.Select(u => u.Id).ToList() ?? new List<string>(),
-        UsersSelect = users.Select(u => new SelectListItem
+        // 1. Check if the model state is valid
+        if (!ModelState.IsValid)
         {
-            Value = u.Id,
-            Text  = $"{u.FullName} ({u.EmployeeNumber})"
-        })
-    };
-
-    return View(vm); // Views/Ticket/Edit.cshtml (same VM as Create)
-}
-
-// POST: /Ticket/Edit
-[HttpPost]
-public IActionResult Edit(CreateTicketViewModel vm)
-{
-    // repopulate selects if validation fails
-    if (!ModelState.IsValid)
-    {
-        var users = _userRepository.GetAllUsers();
-        vm.UsersSelect = users.Select(u => new SelectListItem
-        {
-            Value = u.Id,
-            Text  = $"{u.FullName} ({u.EmployeeNumber})"
-        });
-        return View(vm);
+            var tempVm = _ticketService.BuildVmForEdit(vm.Ticket.TicketNumber);
+            if (tempVm != null)
+            {
+                // Transfer back the user input and return the view
+                tempVm.Ticket = vm.Ticket;
+                tempVm.CreatedByUserId = vm.CreatedByUserId;
+                tempVm.HandledByUserIds = vm.HandledByUserIds;
+                return View(tempVm);
+            }
+            return View(vm); 
+        }
+       
+        _ticketService.UpdateTicketFromVm(vm);
+        
+        // 3. Redirect to the Details view after a successful save
+        return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
     }
-
-    // map selected users back to embedded objects
-    var allUsers = _userRepository.GetAllUsers();
-
-    vm.Ticket.CreatedBy = string.IsNullOrWhiteSpace(vm.CreatedByUserId)
-        ? null
-        : allUsers.FirstOrDefault(u => u.Id == vm.CreatedByUserId);
-
-    vm.Ticket.HandledBy = (vm.HandledByUserIds ?? new List<string>())
-        .Select(id => allUsers.FirstOrDefault(u => u.Id == id))
-        .Where(u => u != null)
-        .ToList()!;
-
-    // do NOT overwrite CreatedAt; keep the original value
-    vm.Ticket.HandledBy ??= new List<User>();
-
-    _ticketRepository.UpdateTicket(vm.Ticket);  // updates by TicketNumber in your repo
-    return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
-}
-
-// POST: /Ticket/Delete/400
-[HttpPost("Ticket/Delete/{ticketNumber:int}")]
-public IActionResult Delete(int ticketNumber)
-{
-    _ticketRepository.DeleteTicket(ticketNumber);
-    return RedirectToAction(nameof(Index));
-}
-
 
 
 }

@@ -3,69 +3,96 @@
     ViewData["Title"] = "Edit Ticket";
 }
 
-<h2>Edit Ticket @Model.Ticket.TicketNumber</h2>
+<h2 class="mb-4">Edit Ticket #@Model.Ticket.TicketNumber</h2>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Ticket.Id" />
-    <div class="mb-3">
-        <label asp-for="Ticket.TicketNumber" class="form-label"></label>
-        <input asp-for="Ticket.TicketNumber" class="form-control" readonly/>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Ticket.Id" />
+            <input type="hidden" asp-for="Ticket.TicketNumber" />
+            <div class="row">
+
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3">Core Details</h5>
+                    
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Title" class="form-label fw-bold"></label>
+                        <input asp-for="Ticket.Title" class="form-control"/>
+                        <span asp-validation-for="Ticket.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Description" class="form-label fw-bold"></label>
+                        <textarea asp-for="Ticket.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Ticket.Description" class="text-danger"></span>
+                    </div>
+
+                    <hr class="my-4" />
+                    
+                    <h5 class="text-primary mb-3">Personnel</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Created By</label>
+                        <select asp-for="CreatedByUserId" asp-items="Model.UsersSelect" class="form-select">
+                            <option value="">-- None --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Handled By</label>
+                        <select asp-for="HandledByUserIds" asp-items="Model.UsersSelect" class="form-select" multiple size="4"></select>
+                        <div class="form-text">Hold Ctrl/Cmd to select multiple handlers.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 border-start ps-4">
+                    <h5 class="text-primary mb-3">Classification & Assignment</h5>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Ticket.State" class="form-label fw-bold"></label>
+                        <select asp-for="Ticket.State" class="form-select"
+                                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.State>()"></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Priority" class="form-label fw-bold"></label>
+                        <select asp-for="Ticket.Priority" class="form-select"
+                                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.Priority>()"></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.IncidentType" class="form-label fw-bold"></label>
+                        <select asp-for="Ticket.IncidentType" class="form-select"
+                                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.IncidentType>()"></select>
+                    </div>
+                    
+                    <hr class="my-4" />
+                    
+                    <h5 class="text-primary mb-3">Timeline</h5>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Deadline" class="form-label fw-bold"></label>
+                        <input asp-for="Ticket.Deadline" type="datetime-local" class="form-control"/>
+                        <span asp-validation-for="Ticket.Deadline" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.CreatedAt" class="form-label fw-bold"></label>
+                        <input asp-for="Ticket.CreatedAt" class="form-control" readonly/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+                <a asp-action="Details" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> Save Changes
+                </button>
+            </div>
+            
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Title" class="form-label"></label>
-        <input asp-for="Ticket.Title" class="form-control"/>
-        <span asp-validation-for="Ticket.Title" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Description" class="form-label"></label>
-        <textarea asp-for="Ticket.Description" class="form-control"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Priority" class="form-label"></label>
-        <select asp-for="Ticket.Priority" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.Priority>()"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.IncidentType" class="form-label"></label>
-        <select asp-for="Ticket.IncidentType" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.IncidentType>()"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.State" class="form-label"></label>
-        <select asp-for="Ticket.State" class="form-select"
-                asp-items="Html.GetEnumSelectList<NoSQLproject.Models.State>()"></select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Created By</label>
-        <select asp-for="CreatedByUserId" asp-items="Model.UsersSelect" class="form-select">
-            <option value="">-- None --</option>
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Handled By</label>
-        <select asp-for="HandledByUserIds" asp-items="Model.UsersSelect" class="form-select" multiple size="6"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Deadline" class="form-label"></label>
-        <input asp-for="Ticket.Deadline" type="datetime-local" class="form-control"/>
-    </div>
-
-    <!-- keep CreatedAt visible but read-only if you like -->
-    <div class="mb-3">
-        <label asp-for="Ticket.CreatedAt" class="form-label"></label>
-        <input asp-for="Ticket.CreatedAt" class="form-control" readonly/>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Details" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -22,10 +22,10 @@ public class Ticket
     
     [BsonElement("priority")]
     [BsonRepresentation(BsonType.String)] 
-    public Priority Priority { get; set; }
+    public Priority? Priority { get; set; }
     
     [BsonElement("deadline")]
-    public DateTime Deadline { get; set; }
+    public DateTime? Deadline { get; set; }
     
     [BsonElement("description")]
     public string Description { get; set; }
@@ -38,15 +38,15 @@ public class Ticket
     public string Title { get; set; }
     
     [BsonElement("resolvedAt")]
-    public DateTime ResolvedAt { get; set; }
+    public DateTime? ResolvedAt { get; set; }
     
     [BsonElement("createdBy")]
-    public User CreatedBy { get; set; }
+    public UserInTicket CreatedBy { get; set; }
     
     [BsonElement("handledBy")]
-    public List<User> HandledBy { get; set; }
+    public List<UserInTicket> HandledBy { get; set; }
     
-    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, User createdBy, List<User> handledBy)
+    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, UserInTicket createdBy, List<UserInTicket> handledBy)
     {
         Id = id;
         TicketNumber = ticketNumber;

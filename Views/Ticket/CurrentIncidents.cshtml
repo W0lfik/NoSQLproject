@@ -145,7 +145,9 @@
                             </td>
                             <td>@ticket.CreatedAt.ToShortDateString()</td>
                             <td class="@(ticket.Deadline < DateTime.UtcNow ? "text-danger fw-bold" : "")">
-                                @ticket.Deadline.ToShortDateString()
+                                @((ticket.Deadline.HasValue)
+                                    ? ticket.Deadline.Value.ToShortDateString()
+                                    : "—")
                             </td>
                             <td>@ticket.State</td>
                         </tr>

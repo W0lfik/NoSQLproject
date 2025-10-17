@@ -1,150 +1,177 @@
-@model NoSQLproject.Models.Ticket
+@model Ticket
 @{
     ViewData["Title"] = "Ticket Details";
 }
+<link rel="stylesheet" href="~/css/ticket.css"/>
+<div class="d-flex justify-content-between align-items-end">
+    <div>
+        <h2>Ticket @Model.TicketNumber — @Model.Title</h2>
+        <h6 class="text-secondary">Id: @Model.Id</h6>
+    </div>
 
-<h2>Ticket @Model.TicketNumber — @Model.Title</h2>
+    <div class="mb-3 d-flex gap-2">
+        <a asp-action="Manage" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-warning text-white">
+            Manage
+        </a>
+        <div>
+            <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary w-100">
+                Edit
+            </a>
+        </div>
 
-<div class="mb-3 d-flex gap-2">
-    <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary">
-        Edit
-    </a>
+        <div>
+            <form asp-action="Delete" asp-route-ticketNumber="@Model.TicketNumber" method="post" class="d-inline w-100">
+                <button type="submit" class="btn btn-danger w-100"
+                        onclick="return confirm('Delete this ticket?');">
+                    Delete
+                </button>
+            </form>
+        </div>
 
-    <form asp-action="Delete" asp-route-ticketNumber="@Model.TicketNumber" method="post" class="d-inline">
-        <button type="submit" class="btn btn-danger"
-                onclick="return confirm('Delete this ticket?');">
-            Delete
-        </button>
-    </form>
-
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+        <div><a asp-action="Index" class="btn btn-secondary w-100">Back</a>
+        </div>
+    </div>
 </div>
-
 <div class="card">
     <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Id</dt>
-            <dd class="col-sm-9">@Model.Id</dd>
 
-            <dt class="col-sm-3">Ticket Number</dt>
-            <dd class="col-sm-9">@Model.TicketNumber</dd>
+        <div class="row">
+            <div class="col-md-6 border-end">
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
+                    <dd class="col-sm-8">@Model.TicketNumber</dd>
 
-            <dt class="col-sm-3">Title</dt>
-            <dd class="col-sm-9">@Model.Title</dd>
+                    <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
+                    <dd class="col-sm-8">
+                        @{
+                            if (Model.Priority == null)
+                            {
+                                <span class="badge bg-warning text-dark">To be assigned</span>
+                            }
 
-            <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9">@Model.Description</dd>
+                            string priorityColor = "";
+                            switch (Model.Priority)
+                            {
+                                case Priority.P1: priorityColor = "btn-danger"; break;
+                                case Priority.P2: priorityColor = "btn-warning text-dark"; break;
+                                case Priority.P3: priorityColor = "btn-info text-dark"; break;
+                                case Priority.P4: priorityColor = "btn-secondary"; break;
+                            }
+                        }
+                        
+                        <span class="badge @priorityColor">@Model.Priority</span>
+                    </dd>
 
-            <dt class="col-sm-3">Incident Type</dt>
-            <dd class="col-sm-9">@Model.IncidentType</dd>
+                    <dt class="col-sm-4 text-muted fw-bold">Incident Type</dt>
+                    <dd class="col-sm-8">@Model.IncidentType</dd>
 
-            <dt class="col-sm-3">Priority</dt>
-            <dd class="col-sm-9">@Model.Priority</dd>
+                    <dt class="col-sm-4 text-muted fw-bold">Description</dt>
+                    <dd class="col-sm-8">@Model.Description</dd>
+                </dl>
+            </div>
 
-            <dt class="col-sm-3">State</dt>
-            <dd class="col-sm-9">@Model.State</dd>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted fw-bold">State</dt>
+                    <dd class="col-sm-8">
+                        @{
+                            string stateColor = "bg-success";
+                            switch (Model.State)
+                            {
+                                case State.open:
+                                    stateColor = "bg-danger";
+                                    break;
+                                case State.inProgress:
+                                    stateColor = "bg-warning";
+                                    break;
+                            }
+                        }
+                        <span class="badge @stateColor">@Model.State</span>
+                    </dd>
 
-            <dt class="col-sm-3">Created At</dt>
-            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                    <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
 
-            <dt class="col-sm-3">Deadline</dt>
-            <dd class="col-sm-9">@Model.Deadline.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                    <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
+                    <dd class="col-sm-8 text-danger"> @(Model.Deadline.HasValue
+                            ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            : "—")</dd>
 
-            @if (Model.ResolvedAt != default(DateTime))
-            {
-                <dt class="col-sm-3">Resolved At</dt>
-                <dd class="col-sm-9">@Model.ResolvedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
-            }
-        </dl>
-
-        <h4 class="mt-4">Created By</h4>
+                    @if (Model.ResolvedAt != default(DateTime))
+                    {
+                        <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
+                        <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
+                                ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                : "—")</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<h5 class="mt-4">Created By</h5>
         @if (Model.CreatedBy is not null)
         {
-            <dl class="row">
-                <dt class="col-sm-3">Name</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.FullName</dd>
+            <div class="card border-0 mb-3 card-fit card-strong" style="border-radius: 12px;">
+                <div class="card-body p-0 ">
+                    <div class="d-flex align-items-center gap-sm-2">
+                        <div class="fw-semibold">@Model.CreatedBy.FullName</div>
+                        <div
+                            class="text-muted small">@Model.CreatedBy.EmployeeNumber | @Model.CreatedBy.TypeOfUser</div>
 
-                <dt class="col-sm-3">Employee Number</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.EmployeeNumber</dd>
+                    </div>
 
-                <dt class="col-sm-3">Email</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.Email</dd>
+                    <div class="mt-2 d-flex align-items-center gap-2 text-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
+                            <path
+                                d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
+                        </svg>
 
-                <dt class="col-sm-3">Phone</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.Phone</dd>
-
-                <dt class="col-sm-3">Location</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.Location</dd>
-
-                <dt class="col-sm-3">Role</dt>
-                <dd class="col-sm-9">@Model.CreatedBy.TypeOfUser</dd>
-            </dl>
+                        <a class="text-muted text-decoration-none"
+                           href="mailto:@Model.CreatedBy.Email">@Model.CreatedBy.Email</a>
+                    </div>
+                </div>
+            </div>
         }
         else
         {
             <p class="text-muted">No creator assigned.</p>
         }
 
-        <h4 class="mt-4">Handled By</h4>
-        @{int i = 0;}
+        <h5 class="mt-4">Handled By</h5>
         @if (Model.HandledBy != null && Model.HandledBy.Any())
         {
-            <ul class="list-group">
-            @foreach (var h in Model.HandledBy)
-            {
-                var collapseId = $"handler-{i}";
-                <li class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <button class="btn btn-sm btn-outline-secondary me-2"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#@collapseId"
-                                    aria-expanded="false"
-                                    aria-controls="@collapseId">
-                                <span class="caret">▸</span>
-                            </button>
-                            <div>
-                                <strong>@h.FullName</strong>
-                                <span class="text-muted">(@h.EmployeeNumber) — @h.TypeOfUser</span>
+            <div class="d-flex gap-sm-3">
+                @foreach (var user in Model.HandledBy)
+                {
+                    <div class="card border-0 mb-3 card-fit card-strong" style="border-radius: 12px;">
+                        <div class="card-body p-0 ">
+                            <div class="d-flex align-items-center gap-sm-2">
+                                <div class="fw-semibold">@user.FullName</div>
+                                <div class="text-muted small">@user.EmployeeNumber | @user.TypeOfUser</div>
+
+                            </div>
+
+                            <div class="mt-2 d-flex align-items-center gap-2 text-muted">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
+                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
+                                    <path
+                                        d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
+                                </svg>
+
+                                <a class="text-muted text-decoration-none"
+                                   href="mailto:@user.Email">@user.Email</a>
                             </div>
                         </div>
-                        <span class="text-muted">@h.Email</span>
                     </div>
-
-                    <div class="collapse mt-2" id="@collapseId">
-                        <dl class="row mb-0">
-                            <dt class="col-sm-3">Email</dt>
-                            <dd class="col-sm-9">@h.Email</dd>
-
-                            <dt class="col-sm-3">Phone</dt>
-                            <dd class="col-sm-9">@h.Phone</dd>
-
-                            <dt class="col-sm-3">Location</dt>
-                            <dd class="col-sm-9">@h.Location</dd>
-
-                            <dt class="col-sm-3">Employee Number</dt>
-                            <dd class="col-sm-9">@h.EmployeeNumber</dd>
-
-                            <dt class="col-sm-3">Role</dt>
-                            <dd class="col-sm-9">@h.TypeOfUser</dd>
-                        </dl>
-                    </div>
-                </li>
-                i++;
-            }
-            </ul>
+                }
+            </div>
         }
         else
         {
             <p class="text-muted">No handlers assigned yet.</p>
         }
-
-        <style>
-            /* Rotate the caret when open */
-            button[aria-expanded="true"] .caret { transform: rotate(90deg); }
-            .caret { display:inline-block; transition: transform .15s ease-in-out; }
-        </style>
-
-    </div>
-</div>
