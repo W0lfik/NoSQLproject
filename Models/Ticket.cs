@@ -41,12 +41,12 @@ public class Ticket
     public DateTime? ResolvedAt { get; set; }
     
     [BsonElement("createdBy")]
-    public User CreatedBy { get; set; }
+    public UserInTicket CreatedBy { get; set; }
     
     [BsonElement("handledBy")]
-    public List<User> HandledBy { get; set; }
+    public List<UserInTicket> HandledBy { get; set; }
     
-    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, User createdBy, List<User> handledBy)
+    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, UserInTicket createdBy, List<UserInTicket> handledBy)
     {
         Id = id;
         TicketNumber = ticketNumber;

@@ -79,7 +79,7 @@ namespace NoSQLproject.Services
 
             // current user as CreatedBy
             ticket.CreatedBy = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "EmployeeNumber") is Claim empNumClaim
-                ? _userRepository.GetByEmployeeNumber(int.Parse(empNumClaim.Value))
+                ? ToLightUser(_userRepository.GetByEmployeeNumber(int.Parse(empNumClaim.Value)))
                 : null;
 
             _ticketRepository.CreateTicket(ticket); // your repo does auto-numbering
@@ -111,7 +111,7 @@ namespace NoSQLproject.Services
             ApplyPeopleFromVm(vm.Ticket, vm);
 
             // keep CreatedAt as-is
-            vm.Ticket.HandledBy ??= new List<User>();
+            vm.Ticket.HandledBy ??= new List<UserInTicket>();
 
             _ticketRepository.UpdateTicket(vm.Ticket);
             return true;
@@ -126,11 +126,11 @@ namespace NoSQLproject.Services
             // Assign CreatedBy (single)
             if (!string.IsNullOrWhiteSpace(vm.CreatedByUserId))
             {
-                ticket.CreatedBy = _userRepository.GetById(vm.CreatedByUserId);
+                ticket.CreatedBy = ToLightUser(_userRepository.GetById(vm.CreatedByUserId));
             }
 
             // Assign HandledBy (multi)
-            ticket.HandledBy = new List<User>();
+            ticket.HandledBy = new List<UserInTicket>();
 
             if (vm.HandledByUserIds != null)
             {
@@ -138,10 +138,12 @@ namespace NoSQLproject.Services
                 {
                     User user = _userRepository.GetById(id);
                     if (user != null)
-                        ticket.HandledBy.Add(user);
+                        ticket.HandledBy.Add(ToLightUser(user));
                 }
             }
         }
-        
+
+        private static UserInTicket ToLightUser(User u) => new UserInTicket(u);
+
     }
 }

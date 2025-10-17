@@ -51,7 +51,7 @@ public class TicketRepository : ITicketRepository
         ticket.State = State.open;
         ticket.Deadline = null;
         ticket.ResolvedAt = null;
-        ticket.HandledBy = new List<User>();
+        ticket.HandledBy = new List<UserInTicket>();
 
         // 2) assign TicketNumber if missing/zero
         if (ticket.TicketNumber <= 0)
