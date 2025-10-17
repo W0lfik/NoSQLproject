@@ -14,32 +14,11 @@
         <label asp-for="Ticket.Description" class="form-label"></label>
         <textarea asp-for="Ticket.Description" class="form-control"></textarea>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Priority" class="form-label"></label>
-        <select asp-for="Ticket.Priority" class="form-select"
-                asp-items="Html.GetEnumSelectList<Priority>()"></select>
-    </div>
-
+    
     <div class="mb-3">
         <label asp-for="Ticket.IncidentType" class="form-label"></label>
         <select asp-for="Ticket.IncidentType" class="form-select"
                 asp-items="Html.GetEnumSelectList<IncidentType>()"></select>
-    </div>
-
-    <!-- Created By (single, optional) -->
-    <div class="mb-3">
-        <label class="form-label">Created By</label>
-        <select asp-for="CreatedByUserId" asp-items="Model.UsersSelect" class="form-select">
-            <option value="">-- None --</option>
-        </select>
-    </div>
-
-    <!-- Handled By (multi, optional) -->
-    <div class="mb-3">
-        <label class="form-label">Handled By</label>
-        <select asp-for="HandledByUserIds" asp-items="Model.UsersSelect" class="form-select" multiple size="6"></select>
-        <div class="form-text">Hold Ctrl/Cmd to select multiple. Leave empty for none.</div>
     </div>
 
     <div class="mb-3">
