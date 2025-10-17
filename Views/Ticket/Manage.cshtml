@@ -4,7 +4,7 @@
     // Define the list of priorities for the buttons
     var priorities = Enum.GetNames(typeof(NoSQLproject.Models.Priority));
 }
-
+<link rel="stylesheet" href="~/css/ticket.css"/>
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
         <h2>Ticket @Model.Ticket.TicketNumber — @Model.Ticket.Title</h2>
@@ -54,6 +54,8 @@
             <div class="row">
                 <div class="col-md-6 border-end">
                     <dl class="row">
+                        <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
+                        <dd class="col-sm-8">@Model.Ticket.TicketNumber</dd>
                         
                         <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
                         <dd class="col-sm-8">
@@ -83,9 +85,6 @@
                                 }
                             </div>
                         </dd>
-                        
-                        <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
-                        <dd class="col-sm-8">@Model.Ticket.TicketNumber</dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Incident Type</dt>
                         <dd class="col-sm-8">@Model.Ticket.IncidentType</dd>
@@ -136,10 +135,30 @@
 </div>
 
 <h4 class="mt-4">Created By</h4>
-@* You would place your existing Created By display card/content here *@
 @if (Model.Ticket.CreatedBy is not null)
 {
-    @* Example of where your existing card/content for CreatedBy would go *@
+    <div class="card border-0 mb-3 card-fit card-strong" style="border-radius: 12px;">
+        <div class="card-body p-0 ">
+            <div class="d-flex align-items-center gap-sm-2">
+                <div class="fw-semibold">@Model.Ticket.CreatedBy.FullName</div>
+                <div
+                    class="text-muted small">@Model.Ticket.CreatedBy.EmployeeNumber | @Model.Ticket.CreatedBy.TypeOfUser</div>
+
+            </div>
+
+            <div class="mt-2 d-flex align-items-center gap-2 text-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-envelope" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217L8 8.083.0 4.217V4z"/>
+                    <path
+                        d="M0 4.697v7.104l5.803-3.558L0 4.697zm6.761 3.396-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.809-1.88l-6.57-4.027L8 9.583l-1.239-.49zM16 4.697l-5.803 3.546L16 11.801V4.697z"/>
+                </svg>
+
+                <a class="text-muted text-decoration-none"
+                   href="mailto:@Model.Ticket.CreatedBy.Email">@Model.Ticket.CreatedBy.Email</a>
+            </div>
+        </div>
+    </div>
 }
 else
 {

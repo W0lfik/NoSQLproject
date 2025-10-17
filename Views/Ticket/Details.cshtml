@@ -48,8 +48,18 @@
                             {
                                 <span class="badge bg-warning text-dark">To be assigned</span>
                             }
+
+                            string priorityColor = "";
+                            switch (Model.Priority)
+                            {
+                                case Priority.P1: priorityColor = "btn-danger"; break;
+                                case Priority.P2: priorityColor = "btn-warning text-dark"; break;
+                                case Priority.P3: priorityColor = "btn-info text-dark"; break;
+                                case Priority.P4: priorityColor = "btn-secondary"; break;
+                            }
                         }
-                        <span class="badge bg-warning text-dark">@Model.Priority</span>
+                        
+                        <span class="badge @priorityColor">@Model.Priority</span>
                     </dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Incident Type</dt>
