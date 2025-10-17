@@ -1,32 +1,46 @@
 @model CreateTicketViewModel
+@{
+    ViewData["Title"] = "Create Ticket";
+}
+<link rel="stylesheet" href="~/css/ticket.css" />
 
-<h2>Create Ticket</h2>
+<div class="container d-flex justify-content-center align-items-start" style="min-height: 80vh;">
+    <div class="col-lg-6 col-md-8 col-sm-10">
+        <h2 class="mb-4 text-center">Create Ticket</h2>
 
-<form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="mb-3">
-        <label asp-for="Ticket.Title" class="form-label"></label>
-        <input asp-for="Ticket.Title" class="form-control" />
-        <span asp-validation-for="Ticket.Title" class="text-danger"></span>
+        <form asp-action="Create" method="post" class="mb-4">
+            <div class="card card-strong">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Title" class="form-label fw-semibold">Title</label>
+                        <input asp-for="Ticket.Title" class="form-control" placeholder="Short, clear summary" />
+                        <span asp-validation-for="Ticket.Title" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.IncidentType" class="form-label fw-semibold">Incident Type</label>
+                        <select asp-for="Ticket.IncidentType" class="form-select"
+                                asp-items="Html.GetEnumSelectList<IncidentType>()"></select>
+                        <span class="form-text small text-muted">Choose the closest category so the right team picks it up.</span>
+                        <span asp-validation-for="Ticket.IncidentType" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Ticket.Description" class="form-label fw-semibold">Description</label>
+                        <textarea asp-for="Ticket.Description" class="form-control" rows="5"
+                                  placeholder="Describe the issue, steps to reproduce, expected behavior, etc."></textarea>
+                        <span asp-validation-for="Ticket.Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Create</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Description" class="form-label"></label>
-        <textarea asp-for="Ticket.Description" class="form-control"></textarea>
-    </div>
-    
-    <div class="mb-3">
-        <label asp-for="Ticket.IncidentType" class="form-label"></label>
-        <select asp-for="Ticket.IncidentType" class="form-select"
-                asp-items="Html.GetEnumSelectList<IncidentType>()"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Ticket.Deadline" class="form-label"></label>
-        <input asp-for="Ticket.Deadline" type="datetime-local" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
