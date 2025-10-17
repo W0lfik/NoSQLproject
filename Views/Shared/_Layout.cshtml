@@ -26,6 +26,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="mainNav">
+                    <div class="d-flex">
                     <ul class="navbar-nav flex-grow-1">                
 
                         @* Only managers see the Users page *@
@@ -37,6 +38,11 @@
                         }
                        
                     </ul>
+                    
+                    <ul class="navbar-nav flex-grow-1">                
+                        <a class="nav-link text-dark" asp-controller="Ticket" asp-action="Index">Tikets</a>
+                    </ul>
+                    </div>
 
                     <ul class="navbar-nav">
                         @if (isSignedIn)
