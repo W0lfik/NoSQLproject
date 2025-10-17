@@ -77,8 +77,6 @@ public class TicketController : Controller
     {
         if (!ModelState.IsValid) return View(_ticketService.BuildVmForCreate()); // or return View(vm) with repopulated UsersSelect
         
-        
-        
         _ticketService.CreateTicketFromVm(vm);
         return RedirectToAction(nameof(Index));
     }
