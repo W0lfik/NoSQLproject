@@ -113,6 +113,32 @@ namespace NoSQLproject.Services
             // keep CreatedAt as-is
             vm.Ticket.HandledBy ??= new List<UserInTicket>();
 
+            // Auto-assign deadline when managing based on priority
+            Ticket existing = _ticketRepository.GetTicketByNumber(vm.Ticket.TicketNumber);
+            if (existing is not null)
+            {
+                bool priorityChanged = vm.Ticket.Priority != existing.Priority;
+
+                if (priorityChanged && vm.Ticket.Priority.HasValue)
+                {
+                    switch (vm.Ticket.Priority.Value)
+                    {
+                        case Priority.P1:
+                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(2);
+                            break;
+                        case Priority.P2:
+                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(7);
+                            break;
+                        case Priority.P3:
+                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(14);
+                            break;
+                        case Priority.P4:
+                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(21);
+                            break;
+                    }
+                }
+            }
+
             _ticketRepository.UpdateTicket(vm.Ticket);
             return true;
         }
