@@ -50,7 +50,7 @@ public class TicketRepository : ITicketRepository
         ticket.CreatedAt = DateTime.UtcNow;
         ticket.State = State.open;
         ticket.ResolvedAt = null;
-        ticket.HandledBy = new List<UserInTicket>();
+        ticket.HandledBy ??= new List<UserInTicket>();
 
         // 2) assign TicketNumber if missing/zero
         if (ticket.TicketNumber <= 0)
