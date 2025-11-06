@@ -1,40 +1,31 @@
 ﻿
-//manage priority button selection and hidden input update
-document.addEventListener('DOMContentLoaded', function () {
+// Manage view: priority selector behaviour
+document.addEventListener('DOMContentLoaded', () => {
     const hiddenPriorityInput = document.getElementById('HiddenPriority');
-    const priorityButtons = document.querySelectorAll('.priority-btn');
+    if (!hiddenPriorityInput) return;
 
-    // Initialize the hidden field with the current value
-    // Note: If you use the Enum value (int), you need to convert it here. 
-    // The Razor code below sets the name (string) by default for the hidden input.
-    // Let's ensure the default active button is set based on the current model value.
-    if (hiddenPriorityInput && '@Model.Ticket.Priority' !== '') {
-        // If the model priority is set, ensure the hidden field reflects the string name
-        hiddenPriorityInput.value = '@Model.Ticket.Priority';
+    const priorityButtons = Array.from(document.querySelectorAll('.priority-btn'));
+    if (!priorityButtons.length) return;
+
+    const setActivePriority = (value) => {
+        priorityButtons.forEach((btn) => {
+            const isActive = btn.dataset.priorityName === value;
+            btn.classList.toggle('active', isActive);
+        });
+        if (value) {
+            hiddenPriorityInput.value = value;
+        }
+    };
+
+    const initialPriority = hiddenPriorityInput.dataset.initialPriority || hiddenPriorityInput.value;
+    if (initialPriority) {
+        setActivePriority(initialPriority);
     }
 
-    // Add click listener to all buttons
-    priorityButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove 'active' class from all buttons
-            priorityButtons.forEach(btn => btn.classList.remove('active'));
-
-            // Add 'active' class to the clicked button
-            this.classList.add('active');
-
-            // Update the hidden input field with the priority name (e.g., "P1")
-            hiddenPriorityInput.value = this.dataset.priorityName;
+    priorityButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            setActivePriority(button.dataset.priorityName);
         });
     });
-
-    // Set the initial active state based on the current model value
-    // This ensures the button is highlighted on page load
-    if ('@Model.Ticket.Priority' !== '') {
-        const currentPriority = '@Model.Ticket.Priority';
-        const activeBtn = document.querySelector(`.priority-btn[data-priority-name="${currentPriority}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-        }
-    }
 });
 
