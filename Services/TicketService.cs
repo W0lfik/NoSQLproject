@@ -108,38 +108,58 @@ namespace NoSQLproject.Services
         {
             if (vm.Ticket is null) return false;
 
-            ApplyPeopleFromVm(vm.Ticket, vm);
-
-            // keep CreatedAt as-is
-            vm.Ticket.HandledBy ??= new List<UserInTicket>();
-
-            // Auto-assign deadline when managing based on priority
             Ticket existing = _ticketRepository.GetTicketByNumber(vm.Ticket.TicketNumber);
-            if (existing is not null)
-            {
-                bool priorityChanged = vm.Ticket.Priority != existing.Priority;
+            if (existing is null) return false;
 
-                if (priorityChanged && vm.Ticket.Priority.HasValue)
+            Priority? previousPriority = existing.Priority;
+            State previousState = existing.State;
+
+            existing.Title = vm.Ticket.Title;
+            existing.Description = vm.Ticket.Description;
+            existing.IncidentType = vm.Ticket.IncidentType;
+            existing.Priority = vm.Ticket.Priority;
+            existing.State = vm.Ticket.State;
+
+            ApplyPeopleFromVm(existing, vm);
+            existing.HandledBy ??= new List<UserInTicket>();
+
+            bool priorityChanged = existing.Priority != previousPriority;
+            if (priorityChanged)
+            {
+                if (existing.Priority.HasValue)
                 {
-                    switch (vm.Ticket.Priority.Value)
+                    existing.Deadline = existing.Priority.Value switch
                     {
-                        case Priority.P1:
-                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(2);
-                            break;
-                        case Priority.P2:
-                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(7);
-                            break;
-                        case Priority.P3:
-                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(14);
-                            break;
-                        case Priority.P4:
-                            vm.Ticket.Deadline = existing.CreatedAt.AddDays(21);
-                            break;
-                    }
+                        Priority.P1 => existing.CreatedAt.AddDays(2),
+                        Priority.P2 => existing.CreatedAt.AddDays(7),
+                        Priority.P3 => existing.CreatedAt.AddDays(14),
+                        Priority.P4 => existing.CreatedAt.AddDays(21),
+                        _ => existing.Deadline
+                    };
+                }
+                else
+                {
+                    existing.Deadline = null;
                 }
             }
 
-            _ticketRepository.UpdateTicket(vm.Ticket);
+            bool stateChangedToResolved = existing.State == State.resolved && previousState != State.resolved;
+            bool stateChangedFromResolved = existing.State != State.resolved && previousState == State.resolved;
+
+            if (stateChangedToResolved)
+            {
+                existing.ResolvedAt = DateTime.UtcNow;
+            }
+            else if (stateChangedFromResolved)
+            {
+                existing.ResolvedAt = null;
+            }
+            else if (existing.State == State.resolved && existing.ResolvedAt is null)
+            {
+                existing.ResolvedAt = DateTime.UtcNow;
+            }
+
+            _ticketRepository.UpdateTicket(existing);
             return true;
         }
         

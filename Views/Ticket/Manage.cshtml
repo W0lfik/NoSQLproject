@@ -121,8 +121,8 @@
                         <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
                         <dd class="col-sm-8">
                             @(Model.Ticket.ResolvedAt.HasValue
-                                ? Model.Ticket.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                : "—")
+                                ? Model.Ticket.ResolvedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                : "-")
                         </dd>
                     </dl>
                 </div>

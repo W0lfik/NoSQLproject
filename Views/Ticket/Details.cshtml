@@ -97,12 +97,10 @@
                             ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                             : "—")</dd>
 
-                    @if (Model.ResolvedAt != default(DateTime))
+                    @if (Model.ResolvedAt.HasValue)
                     {
                         <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
-                        <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
-                                ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                : "—")</dd>
+                        <dd class="col-sm-8">@Model.ResolvedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
                     }
                 </dl>
             </div>
@@ -175,3 +173,4 @@
         {
             <p class="text-muted">No handlers assigned yet.</p>
         }
+

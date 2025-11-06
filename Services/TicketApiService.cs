@@ -66,17 +66,36 @@ public class TicketApiService : ITicketApiService
 
         if (request.State.HasValue)
         {
+            State previousState = existing.State;
             existing.State = request.State.Value;
+
+            bool stateChangedToResolved = existing.State == State.resolved && previousState != State.resolved;
+            bool stateChangedFromResolved = existing.State != State.resolved && previousState == State.resolved;
+
+            if (stateChangedToResolved)
+            {
+                DateTime resolvedAt = request.ResolvedAt.HasValue
+                    ? request.ResolvedAt.Value
+                    : DateTime.UtcNow;
+                existing.ResolvedAt = NormalizeToUtc(resolvedAt);
+            }
+            else if (stateChangedFromResolved)
+            {
+                existing.ResolvedAt = null;
+            }
+            else if (request.ResolvedAt.HasValue)
+            {
+                existing.ResolvedAt = NormalizeToUtc(request.ResolvedAt.Value);
+            }
+        }
+        else if (request.ResolvedAt.HasValue)
+        {
+            existing.ResolvedAt = NormalizeToUtc(request.ResolvedAt.Value);
         }
 
         if (request.Deadline.HasValue)
         {
             existing.Deadline = NormalizeToUtc(request.Deadline.Value);
-        }
-
-        if (request.ResolvedAt.HasValue)
-        {
-            existing.ResolvedAt = NormalizeToUtc(request.ResolvedAt.Value);
         }
 
         if (request.CreatedBy is not null)
