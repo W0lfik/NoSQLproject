@@ -141,5 +141,32 @@ public class TicketController : Controller
         return RedirectToAction(nameof(Details), new { ticketNumber = vm.Ticket.TicketNumber });
     }
 
+    [HttpGet]
+    public IActionResult SearchHandlerByEmployeeNumber(int employeeNumber)
+    {
+        if (employeeNumber <= 0)
+        {
+            return Json(new { found = false, message = "Enter a valid employee number." });
+        }
+
+        User user = _userRepository.GetByEmployeeNumber(employeeNumber);
+        if (user is null)
+        {
+            return Json(new { found = false, message = $"No employee with number {employeeNumber}." });
+        }
+
+        return Json(new
+        {
+            found = true,
+            user = new
+            {
+                id = user.Id,
+                fullName = user.FullName,
+                employeeNumber = user.EmployeeNumber,
+                typeOfUser = user.TypeOfUser.ToString()
+            }
+        });
+    }
+
 
 }
