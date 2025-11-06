@@ -47,6 +47,7 @@ public class TicketRepository : ITicketRepository
     public void CreateTicket(Ticket ticket)
     {
         // 1) server-side defaults
+        ticket.Priority = null;
         ticket.CreatedAt = DateTime.UtcNow;
         ticket.State = State.open;
         ticket.ResolvedAt = null;
