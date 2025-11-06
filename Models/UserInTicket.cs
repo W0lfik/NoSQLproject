@@ -1,28 +1,32 @@
-﻿using MongoDB.Bson;
+using System.Diagnostics.CodeAnalysis;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace NoSQLproject.Models;
 
-[BsonIgnoreExtraElements] 
+[BsonIgnoreExtraElements]
 public class UserInTicket
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [BsonElement("fullName")]
-    public string FullName { get; set; }
+    public required string FullName { get; set; }
 
     [BsonElement("employeeNumber")]
     public int EmployeeNumber { get; set; }
-    
+
     [BsonElement("email")]
-    public string Email { get; set; }
-    
+    public required string Email { get; set; }
+
     [BsonElement("typeOfUser")]
-    [BsonRepresentation(BsonType.String)] 
+    [BsonRepresentation(BsonType.String)]
     public TypeOfUser TypeOfUser { get; set; }
-    
+
+    public UserInTicket() { }
+
+    [SetsRequiredMembers]
     public UserInTicket(User user)
     {
         Id = user.Id;

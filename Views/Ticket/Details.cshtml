@@ -37,7 +37,7 @@
 
         <div class="row">
             <div class="col-md-6 border-end">
-                <dl class="row">
+                <dl class="row ticket-details">
                     <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
                     <dd class="col-sm-8">@Model.TicketNumber</dd>
 
@@ -66,12 +66,12 @@
                     <dd class="col-sm-8">@Model.IncidentType</dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Description</dt>
-                    <dd class="col-sm-8">@Model.Description</dd>
+                    <dd class="col-sm-8 ticket-field-long">@Model.Description</dd>
                 </dl>
             </div>
 
             <div class="col-md-6">
-                <dl class="row">
+                <dl class="row ticket-details">
                     <dt class="col-sm-4 text-muted fw-bold">State</dt>
                     <dd class="col-sm-8">
                         @{
@@ -90,20 +90,17 @@
                     </dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
-                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("HH:mm dd/MM/yyyy")</dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
                     <dd class="col-sm-8 text-danger"> @(Model.Deadline.HasValue
-                            ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            ? Model.Deadline.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
                             : "—")</dd>
-
-                    @if (Model.ResolvedAt != default(DateTime))
-                    {
-                        <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
-                        <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
-                                ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                : "—")</dd>
-                    }
+                    
+                    <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
+                    <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
+                                             ? Model.ResolvedAt.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
+                                             : "—")</dd>
                 </dl>
             </div>
         </div>
@@ -175,3 +172,4 @@
         {
             <p class="text-muted">No handlers assigned yet.</p>
         }
+

@@ -47,11 +47,11 @@ public class TicketRepository : ITicketRepository
     public void CreateTicket(Ticket ticket)
     {
         // 1) server-side defaults
+        ticket.Priority = null;
         ticket.CreatedAt = DateTime.UtcNow;
         ticket.State = State.open;
-        ticket.Deadline = null;
         ticket.ResolvedAt = null;
-        ticket.HandledBy = new List<UserInTicket>();
+        ticket.HandledBy ??= new List<UserInTicket>();
 
         // 2) assign TicketNumber if missing/zero
         if (ticket.TicketNumber <= 0)

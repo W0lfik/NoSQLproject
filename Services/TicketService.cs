@@ -108,12 +108,58 @@ namespace NoSQLproject.Services
         {
             if (vm.Ticket is null) return false;
 
-            ApplyPeopleFromVm(vm.Ticket, vm);
+            Ticket existing = _ticketRepository.GetTicketByNumber(vm.Ticket.TicketNumber);
+            if (existing is null) return false;
 
-            // keep CreatedAt as-is
-            vm.Ticket.HandledBy ??= new List<UserInTicket>();
+            Priority? previousPriority = existing.Priority;
+            State previousState = existing.State;
 
-            _ticketRepository.UpdateTicket(vm.Ticket);
+            existing.Title = vm.Ticket.Title;
+            existing.Description = vm.Ticket.Description;
+            existing.IncidentType = vm.Ticket.IncidentType;
+            existing.Priority = vm.Ticket.Priority;
+            existing.State = vm.Ticket.State;
+
+            ApplyPeopleFromVm(existing, vm);
+            existing.HandledBy ??= new List<UserInTicket>();
+
+            bool priorityChanged = existing.Priority != previousPriority;
+            if (priorityChanged)
+            {
+                if (existing.Priority.HasValue)
+                {
+                    existing.Deadline = existing.Priority.Value switch
+                    {
+                        Priority.P1 => existing.CreatedAt.AddDays(2),
+                        Priority.P2 => existing.CreatedAt.AddDays(7),
+                        Priority.P3 => existing.CreatedAt.AddDays(14),
+                        Priority.P4 => existing.CreatedAt.AddDays(21),
+                        _ => existing.Deadline
+                    };
+                }
+                else
+                {
+                    existing.Deadline = null;
+                }
+            }
+
+            bool stateChangedToResolved = existing.State == State.resolved && previousState != State.resolved;
+            bool stateChangedFromResolved = existing.State != State.resolved && previousState == State.resolved;
+
+            if (stateChangedToResolved)
+            {
+                existing.ResolvedAt = DateTime.UtcNow;
+            }
+            else if (stateChangedFromResolved)
+            {
+                existing.ResolvedAt = null;
+            }
+            else if (existing.State == State.resolved && existing.ResolvedAt is null)
+            {
+                existing.ResolvedAt = DateTime.UtcNow;
+            }
+
+            _ticketRepository.UpdateTicket(existing);
             return true;
         }
         
