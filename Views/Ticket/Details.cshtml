@@ -37,7 +37,7 @@
 
         <div class="row">
             <div class="col-md-6 border-end">
-                <dl class="row">
+                <dl class="row ticket-details">
                     <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
                     <dd class="col-sm-8">@Model.TicketNumber</dd>
 
@@ -66,12 +66,12 @@
                     <dd class="col-sm-8">@Model.IncidentType</dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Description</dt>
-                    <dd class="col-sm-8">@Model.Description</dd>
+                    <dd class="col-sm-8 ticket-field-long">@Model.Description</dd>
                 </dl>
             </div>
 
             <div class="col-md-6">
-                <dl class="row">
+                <dl class="row ticket-details">
                     <dt class="col-sm-4 text-muted fw-bold">State</dt>
                     <dd class="col-sm-8">
                         @{

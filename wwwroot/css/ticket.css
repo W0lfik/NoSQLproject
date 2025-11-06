@@ -15,3 +15,42 @@ button[aria-expanded="true"] .caret { transform: rotate(90deg); }
 .card {
     border-radius: .50rem !important;
 }
+.ticket-field-value {
+    min-height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.ticket-priority-group {
+    gap: 0.3rem;
+}
+.ticket-priority-group .btn {
+    padding: 0.15rem 0.55rem;
+    line-height: 1.2;
+}
+.ticket-select-pill {
+    width: auto;
+    min-width: 140px;
+    border-radius: 999px;
+    padding: 0.2rem 1.75rem 0.2rem 0.75rem;
+    line-height: 1.25;
+}
+.ticket-details dt,
+.ticket-details dd {
+    min-height: 2.4rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.2rem;
+}
+.ticket-details dd {
+    gap: 0.5rem;
+}
+.ticket-details dt {
+    gap: 0.35rem;
+}
+.ticket-field-long {
+    min-height: auto;
+    display: block;
+    margin-bottom: 0.75rem;
+}

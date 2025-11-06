@@ -52,13 +52,14 @@
 
             <div class="row">
                 <div class="col-md-6 border-end">
-                    <dl class="row">
+                    <dl class="row ticket-details">
                         <dt class="col-sm-4 text-muted fw-bold">Ticket Number</dt>
                         <dd class="col-sm-8">@Model.Ticket.TicketNumber</dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Priority</dt>
                         <dd class="col-sm-8">
-                            <div class="btn-group w-100" role="group" aria-label="Ticket Priority">
+                            <div class="ticket-field-value">
+                                <div class="btn-group ticket-priority-group" role="group" aria-label="Ticket Priority">
                                 @foreach (var p in priorities)
                                 {
                                     // Use a data attribute to store the enum value
@@ -75,13 +76,14 @@
                                         default: buttonClass = "btn-secondary"; break;
                                     }
 
-                                    <button type="button"
-                                            class="btn @buttonClass btn-sm priority-btn @(Model.Ticket.Priority.ToString() == p ? "active" : "")"
-                                            data-priority-name="@p"
-                                            data-priority-value="@dataPriorityValue">
-                                        @p
-                                    </button>
-                                }
+                                        <button type="button"
+                                                class="btn @buttonClass btn-sm priority-btn @(Model.Ticket.Priority.ToString() == p ? "active" : "")"
+                                                data-priority-name="@p"
+                                                data-priority-value="@dataPriorityValue">
+                                            @p
+                                        </button>
+                                    }
+                                </div>
                             </div>
                         </dd>
 
@@ -89,19 +91,21 @@
                         <dd class="col-sm-8">@Model.Ticket.IncidentType</dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Description</dt>
-                        <dd class="col-sm-8 text-wrap">@Model.Ticket.Description</dd>
+                        <dd class="col-sm-8 text-wrap ticket-field-long">@Model.Ticket.Description</dd>
 
                     </dl>
                 </div>
 
-                <div class="col-md-6 ps-4">
-                    <dl class="row">
+                <div class="col-md-6">
+                    <dl class="row ticket-details">
 
                         <dt class="col-sm-4 text-muted fw-bold">State</dt>
                         <dd class="col-sm-8">
-                            <select asp-for="Ticket.State" class="form-select form-select-sm"
-                                    asp-items="Html.GetEnumSelectList<State>()"></select>
-                            <span asp-validation-for="Ticket.State" class="text-danger small"></span>
+                            <div class="ticket-field-value">
+                                <select asp-for="Ticket.State" class="form-select form-select-sm ticket-select-pill"
+                                        asp-items="Html.GetEnumSelectList<State>()"></select>
+                            </div>
+                            <span asp-validation-for="Ticket.State" class="text-danger small d-block mt-1"></span>
                         </dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
