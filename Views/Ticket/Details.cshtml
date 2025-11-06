@@ -90,18 +90,17 @@
                     </dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
-                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("HH:mm dd/MM/yyyy")</dd>
 
                     <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
                     <dd class="col-sm-8 text-danger"> @(Model.Deadline.HasValue
-                            ? Model.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            ? Model.Deadline.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
                             : "—")</dd>
-
-                    @if (Model.ResolvedAt.HasValue)
-                    {
-                        <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
-                        <dd class="col-sm-8">@Model.ResolvedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
-                    }
+                    
+                    <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
+                    <dd class="col-sm-8">@(Model.ResolvedAt.HasValue
+                                             ? Model.ResolvedAt.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
+                                             : "—")</dd>
                 </dl>
             </div>
         </div>

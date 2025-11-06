@@ -109,20 +109,20 @@
                         </dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Created At</dt>
-                        <dd class="col-sm-8">@Model.Ticket.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+                        <dd class="col-sm-8">@Model.Ticket.CreatedAt.ToLocalTime().ToString("HH:mm dd/MM/yyyy")</dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Deadline</dt>
                         <dd class="col-sm-8 text-danger">
                             @(Model.Ticket.Deadline.HasValue
-                                ? Model.Ticket.Deadline.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                ? Model.Ticket.Deadline.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
                                 : "—")
                         </dd>
 
                         <dt class="col-sm-4 text-muted fw-bold">Resolved At</dt>
                         <dd class="col-sm-8">
                             @(Model.Ticket.ResolvedAt.HasValue
-                                ? Model.Ticket.ResolvedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                                : "-")
+                                ? Model.Ticket.ResolvedAt.Value.ToLocalTime().ToString("HH:mm dd/MM/yyyy")
+                                : "—")
                         </dd>
                     </dl>
                 </div>
