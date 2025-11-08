@@ -8,18 +8,42 @@
     <h2 class="mb-4 fw-bold">Overview tickets</h2>
 
     <!-- Search + Navigation buttons -->
-    <form method="get" class="d-flex justify-content-between align-items-center mb-3">
-        <input type="text"
-               name="searchEmail"
-               value="@Context.Request.Query["searchEmail"]"
-               class="form-control w-50"
-               placeholder="Filter by email" />
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form method="get" class="d-flex align-items-center w-50">
+            <input type="text"
+                   name="searchEmail"
+                   value="@Context.Request.Query["searchEmail"]"
+                   class="form-control w-100"
+                   placeholder="Filter by email" />
+            <button type="submit" class="btn btn-primary ms-2">Search</button>
+        </form>
 
-        <div>
+        <div class="d-flex">
             <a asp-action="CurrentIncidents" class="btn btn-secondary me-2">CURRENT INCIDENTS</a>
-            <a asp-action="Create" class="btn btn-success">CREATE INCIDENT</a>
+            <a asp-action="Create" class="btn btn-success me-2">CREATE INCIDENT</a>
+
+            <!-- Archive button form OUTSIDE the GET form -->
+            <form asp-action="ArchiveOldTickets" method="post" class="d-inline">
+                <button type="submit" class="btn btn-warning"
+                        onclick="return confirm('Are you sure you want to archive tickets older than 1 year?')">
+                    ARCHIVE OLD TICKETS
+                </button>
+            </form>
         </div>
-    </form>
+    </div>
+
+
+    <!-- Feedback message -->
+    @if (TempData["Message"] != null)
+    {
+        var alertClass = TempData["MessageType"]?.ToString() == "success"
+        ? "alert-success"
+        : "alert-info";
+
+        <div class="alert @alertClass mt-3">
+            @TempData["Message"]
+        </div>
+    }
 
     <!-- Tickets table -->
     <table class="table table-bordered table-hover align-middle">
@@ -86,4 +110,10 @@
             });
         });
     });
+
+        setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(a => a.remove());
+    }, 4000); // message disappears after 4 seconds
 </script>
+
+

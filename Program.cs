@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews().AddMvcOptions(o => o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ITicketApiService, TicketApiService>();
+builder.Services.AddScoped<ITicketArchiveService, TicketArchiveService>();
 
 builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();

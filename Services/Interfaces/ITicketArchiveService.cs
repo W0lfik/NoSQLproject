@@ -2,5 +2,6 @@
 {
     public interface ITicketArchiveService
     {
+        int ArchiveOldTickets();
     }
 }

@@ -14,13 +14,15 @@ public class TicketController : Controller
     private readonly ITicketRepository _ticketRepository;
     private readonly IUserRepository _userRepository;
     private readonly ITicketService _ticketService;
+    private readonly ITicketArchiveService _ticketArchiveService;
 
 
-    public TicketController(ITicketService ticketService, ITicketRepository ticketRepository, IUserRepository userRepository)
+    public TicketController(ITicketService ticketService, ITicketRepository ticketRepository, IUserRepository userRepository, ITicketArchiveService ticketArchiveService)
     {
         _ticketService = ticketService;
         _ticketRepository = ticketRepository;
         _userRepository = userRepository;
+        _ticketArchiveService = ticketArchiveService;
     }
 
     [HttpGet]
@@ -166,6 +168,28 @@ public class TicketController : Controller
                 typeOfUser = user.TypeOfUser.ToString()
             }
         });
+    }
+
+
+
+    // Anastasia's individual part 
+    [HttpPost]
+    public IActionResult ArchiveOldTickets()
+    {
+        var count = _ticketArchiveService.ArchiveOldTickets();
+
+        if (count > 0)
+        {
+            TempData["MessageType"] = "success";
+            TempData["Message"] = $"{count} ticket(s) older than 1 year have been archived successfully.";
+        }
+        else
+        {
+            TempData["MessageType"] = "info";
+            TempData["Message"] = "No tickets older than 1 year were found to archive.";
+        }
+
+        return RedirectToAction("Index");
     }
 
 
