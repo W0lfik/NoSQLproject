@@ -46,7 +46,10 @@ public class Ticket
     [BsonElement("handledBy")]
     public List<UserInTicket> HandledBy { get; set; }
     
-    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, UserInTicket createdBy, List<UserInTicket> handledBy)
+    [BsonElement("softDeleted")]
+    public bool SoftDeleted { get; set; } = false;
+    
+    public Ticket(string id, int ticketNumber, DateTime createdAt, IncidentType incidentType, Priority priority, DateTime deadline, string description, State state, string title, DateTime resolvedAt, UserInTicket createdBy, List<UserInTicket> handledBy, bool softDeleted)
     {
         Id = id;
         TicketNumber = ticketNumber;
@@ -60,6 +63,7 @@ public class Ticket
         ResolvedAt = resolvedAt;
         CreatedBy = createdBy;
         HandledBy = handledBy;
+        SoftDeleted = softDeleted;
     }
     
     public Ticket() { }
