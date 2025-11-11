@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -66,8 +67,6 @@ public class TicketController : Controller
 
         return View(model);
     }
-
-
 
     [HttpGet]
     public IActionResult Create() => View(_ticketService.BuildVmForCreate());
@@ -165,6 +164,33 @@ public class TicketController : Controller
                 employeeNumber = user.EmployeeNumber,
                 typeOfUser = user.TypeOfUser.ToString()
             }
+        });
+    }
+
+    [HttpGet]
+    public IActionResult SearchHandlersByRole(TypeOfUser role)
+    {
+        List<User> users = _userRepository.GetUsersByRole(role) ?? new List<User>();
+        if (!users.Any())
+        {
+            return Json(new
+            {
+                found = false,
+                message = $"No handlers with role {role}."
+            });
+        }
+
+        return Json(new
+        {
+            found = true,
+            role = role.ToString(),
+            users = users.Select(u => new
+            {
+                id = u.Id,
+                fullName = u.FullName,
+                employeeNumber = u.EmployeeNumber,
+                typeOfUser = u.TypeOfUser.ToString()
+            })
         });
     }
 

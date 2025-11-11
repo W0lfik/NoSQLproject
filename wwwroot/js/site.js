@@ -1,4 +1,4 @@
-﻿
+
 const escapeSelector = (value) => {
     if (window.CSS && typeof window.CSS.escape === 'function') {
         return window.CSS.escape(value);
@@ -42,23 +42,34 @@ const initPrioritySelector = () => {
 const initHandlerSearch = () => {
     const searchInput = document.getElementById('handler-search-input');
     const searchButton = document.getElementById('handler-search-button');
-    const feedback = document.getElementById('handler-search-feedback');
     const handlersSelect = document.getElementById('handlers-select');
 
-    if (!searchInput || !searchButton || !feedback || !handlersSelect) {
+    if (!searchInput || !searchButton || !handlersSelect) {
         return;
     }
 
-    const setFeedback = (message, tone = 'muted') => {
-        feedback.textContent = message;
-        feedback.classList.remove('text-success', 'text-danger', 'text-warning', 'text-muted');
-        const toneClass = {
-            success: 'text-success',
-            danger: 'text-danger',
-            warning: 'text-warning',
-            muted: 'text-muted'
-        }[tone] || 'text-muted';
-        feedback.classList.add(toneClass);
+    const defaultPlaceholder = searchInput.getAttribute('placeholder') || 'Enter an employee number to search.';
+    const toneClassMap = {
+        success: 'is-valid',
+        danger: 'is-invalid',
+        warning: 'border-warning'
+    };
+    const toneClasses = Object.values(toneClassMap).filter(Boolean);
+
+    const setFeedback = (message, tone = 'muted', clearValue = tone !== 'muted') => {
+        const placeholderText = message || defaultPlaceholder;
+
+        if (clearValue) {
+            searchInput.value = '';
+        }
+
+        searchInput.placeholder = placeholderText;
+        toneClasses.forEach((cls) => searchInput.classList.remove(cls));
+
+        const toneClass = toneClassMap[tone];
+        if (toneClass) {
+            searchInput.classList.add(toneClass);
+        }
     };
 
     const performSearch = () => {
@@ -80,7 +91,7 @@ const initHandlerSearch = () => {
             return;
         }
 
-        setFeedback('Searching…', 'muted');
+        setFeedback('Searching...', 'muted', true);
 
         fetch(`${url}?employeeNumber=${encodeURIComponent(employeeNumber)}`, {
             headers: { 'Accept': 'application/json' }
@@ -130,15 +141,93 @@ const initHandlerSearch = () => {
 
     searchInput.addEventListener('input', () => {
         if (!searchInput.value) {
-            setFeedback('Enter an employee number to search.', 'muted');
+            setFeedback('Enter an employee number to search.', 'muted', false);
         }
     });
 
-    setFeedback('Enter an employee number to search.', 'muted');
+    setFeedback('Enter an employee number to search.', 'muted', true);
+};
+const initHandlerRoleFilters = () => {
+    const roleButtons = Array.from(document.querySelectorAll('.handler-role-button'));
+    const handlersSelect = document.getElementById('handlers-select');
+
+    if (!roleButtons.length || !handlersSelect) {
+        return;
+    }
+
+    const handlerOptions = Array.from(handlersSelect.options);
+
+    const setActiveButton = (activeButton) => {
+        roleButtons.forEach((btn) => btn.classList.toggle('active', btn === activeButton));
+    };
+
+    const applyFilter = (allowedIds) => {
+        const allowAll = !Array.isArray(allowedIds) || !allowedIds.length;
+        const allowedSet = allowAll ? null : new Set(allowedIds);
+
+        handlerOptions.forEach((option) => {
+            const shouldShow = allowAll || allowedSet.has(option.value);
+            option.hidden = !shouldShow;
+        });
+
+        handlersSelect.scrollTop = 0;
+    };
+
+    const showAllHandlers = () => {
+        applyFilter(null);
+    };
+
+    roleButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const isReset = button.dataset.roleReset === 'true';
+            if (isReset) {
+                setActiveButton(button);
+                showAllHandlers();
+                return;
+            }
+
+            const role = button.dataset.role;
+            const url = button.dataset.roleSearchUrl;
+            if (!role || !url) {
+                console.warn('Role filter is not configured.');
+                return;
+            }
+
+            setActiveButton(button);
+
+            fetch(`${url}?role=${encodeURIComponent(role)}`, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Request failed with status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (!data || data.found !== true || !Array.isArray(data.users) || !data.users.length) {
+                        applyFilter([]); // hide all since nothing matched
+                        return;
+                    }
+
+                    const allowedIds = data.users
+                        .map((user) => user.id)
+                        .filter((id) => typeof id === 'string' && id.length);
+
+                    applyFilter(allowedIds);
+                })
+                .catch(() => {
+                    console.error('Unable to load users for that role.');
+                    showAllHandlers();
+                });
+        });
+    });
+
+    showAllHandlers();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     initPrioritySelector();
     initHandlerSearch();
+    initHandlerRoleFilters();
 });
-

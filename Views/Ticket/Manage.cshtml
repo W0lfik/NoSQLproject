@@ -183,7 +183,7 @@ else
                 </label>
                 <div class="input-group">
                     <input type="number" min="1" class="form-control" id="handler-search-input"
-                           placeholder="e.g. 1024"/>
+                           placeholder="Enter employee number"/>
                     <button type="button" class="btn btn-outline-primary"
                             id="handler-search-button"
                             data-search-url="@Url.Action("SearchHandlerByEmployeeNumber", "Ticket")">
@@ -192,7 +192,35 @@ else
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div id="handler-search-feedback" class="small text-muted"></div>
+                <label class="form-label small text-muted">
+                    Browse by role
+                </label>
+                <div class="btn-group btn-group-sm w-100 flex-wrap" role="group" aria-label="Handler roles">
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button active"
+                            data-role="all"
+                            data-role-reset="true">
+                        All
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button"
+                            data-role="employee"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Employee
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button"
+                            data-role="service_desk"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Service Desk
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button"
+                            data-role="admin"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Admin
+                    </button>
+                </div>
             </div>
         </div>
 
