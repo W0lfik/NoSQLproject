@@ -1,7 +1,8 @@
 ﻿@using System.Security.Claims
 @{
     var isSignedIn = User?.Identity?.IsAuthenticated ?? false;
-    var isManager = User.IsInRole("manager");   // set in your login claims
+    var isServiceDesk = User.IsInRole("service_desk");   // set in your login claims
+    var isAdmin = User.IsInRole("admin");
 }
 
 <!DOCTYPE html>
@@ -29,8 +30,8 @@
                     <div class="d-flex">
                     <ul class="navbar-nav flex-grow-1">                
 
-                        @* Only managers see the Users page *@
-                        @if (isSignedIn && isManager)
+                        @* Only service desk or admin see the Users page *@
+                        @if (isSignedIn && (isServiceDesk || isAdmin))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">Users</a>

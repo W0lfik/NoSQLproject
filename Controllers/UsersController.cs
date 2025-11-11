@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NoSQLproject.Controllers
 {
-    [Authorize(Roles = "manager")]
+    [Authorize(Roles = "service_desk, admin")]
     public class UsersController : Controller
     {
         private readonly IUserService _users;
