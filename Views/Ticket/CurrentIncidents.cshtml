@@ -135,7 +135,7 @@
                 <tbody>
                     @foreach (var ticket in Model)
                     {
-                        <tr>
+                        <tr data-href="@Url.Action("Details", "Ticket", new { ticketNumber = ticket.TicketNumber })" style="cursor:pointer;">
                             <td>@ticket.TicketNumber</td>
                             <td>@ticket.Title</td>
                             <td>

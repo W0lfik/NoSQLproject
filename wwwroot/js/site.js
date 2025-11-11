@@ -226,8 +226,25 @@ const initHandlerRoleFilters = () => {
     showAllHandlers();
 };
 
+const initClickableRows = () => {
+    const rows = document.querySelectorAll('tr[data-href]');
+    if (!rows.length) {
+        return;
+    }
+
+    rows.forEach((row) => {
+        row.addEventListener('click', () => {
+            const target = row.dataset.href;
+            if (target) {
+                window.location.href = target;
+            }
+        });
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     initPrioritySelector();
     initHandlerSearch();
     initHandlerRoleFilters();
+    initClickableRows();
 });
