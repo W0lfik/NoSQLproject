@@ -36,7 +36,7 @@ public class TicketRepository : ITicketRepository
 
     public List<Ticket> GetAllTickets()
     {
-        return _ticket.Find(ticket => true).ToList();
+        return _ticket.Find(t => !t.SoftDeleted).ToList();
     }
 
     public Ticket? GetTicketByNumber(int ticketNumber)
@@ -82,7 +82,8 @@ public class TicketRepository : ITicketRepository
 
     public void DeleteTicket(int ticketNumber)
     {
-        _ticket.DeleteOne(t => t.TicketNumber == ticketNumber);
+        var update = Builders<Ticket>.Update.Set(t => t.SoftDeleted, true);
+        _ticket.UpdateOne(t => t.TicketNumber == ticketNumber, update);
     }
 
     public Ticket? GetById(string id)

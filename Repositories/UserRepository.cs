@@ -25,6 +25,14 @@ namespace NoSQLproject.Repositories
                         .ToList();
         }
 
+        public List<User> GetUsersByRole(TypeOfUser role)
+        {
+            var projection = GetBasicUserProjection();
+            return _user.Find(u => u.TypeOfUser == role)
+                        .Project<User>(projection)
+                        .ToList();
+        }
+
         // Private helper for reusable projection logic
         private static ProjectionDefinition<User> GetBasicUserProjection()
         {

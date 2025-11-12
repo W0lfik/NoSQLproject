@@ -12,9 +12,9 @@
     </div>
 
     <div class="mb-3 d-flex gap-2">
-        <a asp-action="Manage" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-warning text-white">
+        <button type="submit" form="ticket-manage-form" class="btn btn-warning text-white">
             Manage
-        </a>
+        </button>
         <div>
             <a asp-action="Edit" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-primary w-100">
                 Edit
@@ -176,14 +176,14 @@ else
 <div class="card">
     <div class="card-body">
         <label class="form-label fw-bold">Assign Handlers</label>
-        <div class="row g-2 align-items-end mb-3">
+        <div class="row g-2 align-content-between mb-3">
             <div class="col-md-6 col-lg-5">
                 <label for="handler-search-input" class="form-label small text-muted">
                     Find by employee number
                 </label>
                 <div class="input-group">
                     <input type="number" min="1" class="form-control" id="handler-search-input"
-                           placeholder="e.g. 1024"/>
+                           placeholder="Enter employee number"/>
                     <button type="button" class="btn btn-outline-primary"
                             id="handler-search-button"
                             data-search-url="@Url.Action("SearchHandlerByEmployeeNumber", "Ticket")">
@@ -192,7 +192,35 @@ else
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
-                <div id="handler-search-feedback" class="small text-muted"></div>
+                <label class="form-label small text-muted">
+                    Browse by role
+                </label>
+                <div class="input-group handler-role-group flex-nowrap" role="group" aria-label="Handler roles">
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button flex-fill active"
+                            data-role="all"
+                            data-role-reset="true">
+                        All
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button flex-fill"
+                            data-role="employee"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Employee
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button flex-fill"
+                            data-role="service_desk"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Service Desk
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-secondary handler-role-button flex-fill"
+                            data-role="admin"
+                            data-role-search-url="@Url.Action("SearchHandlersByRole", "Ticket")">
+                        Admin
+                    </button>
+                </div>
             </div>
         </div>
 

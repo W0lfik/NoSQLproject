@@ -1,7 +1,8 @@
 ﻿@using System.Security.Claims
 @{
     var isSignedIn = User?.Identity?.IsAuthenticated ?? false;
-    var isManager = User.IsInRole("manager");   // set in your login claims
+    var isServiceDesk = User.IsInRole("service_desk");   // set in your login claims
+    var isAdmin = User.IsInRole("admin");
 }
 
 <!DOCTYPE html>
@@ -18,7 +19,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">NoSQLproject</a>
+                <a class="navbar-brand" asp-controller="Ticket" asp-action="Index">Ticket System</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                         aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,8 +30,8 @@
                     <div class="d-flex">
                     <ul class="navbar-nav flex-grow-1">                
 
-                        @* Only managers see the Users page *@
-                        @if (isSignedIn && isManager)
+                        @* Only service desk or admin see the Users page *@
+                        @if (isSignedIn && (isServiceDesk || isAdmin))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Users" asp-action="Index">Users</a>

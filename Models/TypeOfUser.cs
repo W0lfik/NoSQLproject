@@ -2,5 +2,5 @@ namespace NoSQLproject.Models;
 
 public enum TypeOfUser
 {
-    employee, manager, admin
+    employee, service_desk, admin
 }
