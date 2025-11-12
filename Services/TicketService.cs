@@ -4,6 +4,7 @@ using NoSQLproject.Repositories.Interfaces;
 using NoSQLproject.Services.Interfaces;
 using System.Security.Claims;
 
+
 namespace NoSQLproject.Services
 {
     public class TicketService : ITicketService
@@ -11,50 +12,41 @@ namespace NoSQLproject.Services
         private readonly ITicketRepository _ticketRepository;
         private readonly IUserRepository _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly TicketFilterService _filterService;
 
-        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository,  IHttpContextAccessor httpContextAccessor)
+
+        public TicketService(ITicketRepository ticketRepository, IUserRepository userRepository,  IHttpContextAccessor httpContextAccessor, TicketFilterService filterService)
         {
             _ticketRepository = ticketRepository;
             _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
+            _filterService = filterService;
         }
 
-        public List<Ticket> GetFilteredAndSortedTickets(string searchEmail, string sortOrder)
+
+        public List<Ticket> GetFilteredAndSortedTickets(string searchQuery, string sortOrder, User currentUser)
         {
-            var tickets = _ticketRepository.GetAllTickets();
-
-            // search by email
-            if (!string.IsNullOrEmpty(searchEmail))
+            IEnumerable<Ticket> tickets = currentUser.TypeOfUser switch
             {
-                tickets = tickets
+                TypeOfUser.employee => _ticketRepository.GetAllTickets()
                     .Where(t =>
-                        t.CreatedBy != null &&
-                        t.CreatedBy.Email != null &&
-                        t.CreatedBy.Email.Contains(searchEmail, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+                        (t.CreatedBy != null && t.CreatedBy.Id == currentUser.Id) ||
+                        (t.HandledBy != null && t.HandledBy.Any(u => u.Id == currentUser.Id))),
 
-            // asc-desc
-            tickets = sortOrder switch
-            {
-                "id_desc" => tickets.OrderByDescending(t => t.TicketNumber).ToList(),
-                "id_asc" => tickets.OrderBy(t => t.TicketNumber).ToList(),
+                TypeOfUser.service_desk => _ticketRepository.GetAllTickets(),
 
-                "user_desc" => tickets.OrderByDescending(t => t.CreatedBy?.FullName).ToList(),
-                "user_asc" => tickets.OrderBy(t => t.CreatedBy?.FullName).ToList(),
+                TypeOfUser.admin => _ticketRepository.GetAllTickets(),
 
-                "date_desc" => tickets.OrderByDescending(t => t.CreatedAt).ToList(),
-                "date_asc" => tickets.OrderBy(t => t.CreatedAt).ToList(),
-
-                "deadline_desc" => tickets.OrderByDescending(t => t.Deadline).ToList(),
-                "deadline_asc" => tickets.OrderBy(t => t.Deadline).ToList(),
-
-                _ => tickets.OrderBy(t => t.TicketNumber).ToList()
+                _ => Enumerable.Empty<Ticket>()
             };
 
+            // Apply search + sort in the separate class
+            tickets = _filterService.ApplySearchAndSort(tickets, searchQuery, sortOrder);
 
-            return tickets;
+            return tickets.ToList();
         }
+
+
 
         public Ticket? GetByTicketNumber(int ticketNumber) =>
             _ticketRepository.GetTicketByNumber(ticketNumber);

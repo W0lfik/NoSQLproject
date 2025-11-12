@@ -10,6 +10,8 @@ builder.Services.AddControllersWithViews().AddMvcOptions(o => o.SuppressImplicit
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ITicketApiService, TicketApiService>();
 builder.Services.AddScoped<ITicketArchiveService, TicketArchiveService>();
+builder.Services.AddScoped<TicketFilterService>();
+
 
 builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();

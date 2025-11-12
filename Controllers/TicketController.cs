@@ -27,23 +27,42 @@ public class TicketController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index(string searchEmail, string sortOrder)
+    public IActionResult Index(string searchQuery, string sortOrder)
     {
-        var tickets = _ticketService.GetFilteredAndSortedTickets(searchEmail, sortOrder);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return RedirectToAction("Login", "Login");
+
+        var user = _userRepository.GetById(userId);
+        if (user == null)
+            return Unauthorized();
+
+        var tickets = _ticketService.GetFilteredAndSortedTickets(searchQuery, sortOrder, user);
+
+        ViewBag.Role = user.TypeOfUser;
 
         ViewData["IdSortParam"] = sortOrder == "id_desc" ? "id_asc" : "id_desc";
         ViewData["UserSortParam"] = sortOrder == "user_desc" ? "user_asc" : "user_desc";
         ViewData["DateSortParam"] = sortOrder == "date_desc" ? "date_asc" : "date_desc";
         ViewData["DeadlineSortParam"] = sortOrder == "deadline_desc" ? "deadline_asc" : "deadline_desc";
 
-
         return View(tickets);
     }
 
     [HttpGet]
-    public IActionResult CurrentIncidents(bool showList = false, string searchEmail = "", string sortOrder = "", string viewType = "open")
+    public IActionResult CurrentIncidents(bool showList = false, string searchQuery = "", string sortOrder = "", string viewType = "open")
     {
-        var tickets = _ticketService.GetFilteredAndSortedTickets(searchEmail, sortOrder);
+        // get current user
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return RedirectToAction("Login", "Login");
+
+        var user = _userRepository.GetById(userId);
+        if (user == null)
+            return Unauthorized();
+
+        // pass current user
+        var tickets = _ticketService.GetFilteredAndSortedTickets(searchQuery, sortOrder, user);
 
         var openTickets = tickets
             .Where(t => t.State.ToString().Equals("Open", StringComparison.OrdinalIgnoreCase))
@@ -55,6 +74,7 @@ public class TicketController : Controller
 
         var model = viewType == "overdue" ? overdueTickets : openTickets;
 
+        ViewBag.Role = user.TypeOfUser;
         ViewBag.TotalTickets = tickets.Count;
         ViewBag.OpenTickets = openTickets.Count;
         ViewBag.OverdueTickets = overdueTickets.Count;
@@ -66,9 +86,9 @@ public class TicketController : Controller
         ViewData["DateSortParam"] = sortOrder == "date_desc" ? "date_asc" : "date_desc";
         ViewData["DeadlineSortParam"] = sortOrder == "deadline_desc" ? "deadline_asc" : "deadline_desc";
 
-
         return View(model);
     }
+
 
     [HttpGet]
     public IActionResult Create() => View(_ticketService.BuildVmForCreate());
@@ -85,6 +105,16 @@ public class TicketController : Controller
     [HttpGet("Ticket/Details/{ticketNumber:int}")]
     public IActionResult Details(int ticketNumber)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return RedirectToAction("Login", "Login");
+
+        var user = _userRepository.GetById(userId);
+        if (user == null)
+            return Unauthorized();
+
+        ViewBag.Role = user.TypeOfUser;
+
         Ticket ticket = _ticketService.GetByTicketNumber(ticketNumber);
         return ticket is null ? NotFound() : View(ticket);
     }

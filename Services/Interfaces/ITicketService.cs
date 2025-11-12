@@ -4,7 +4,7 @@ namespace NoSQLproject.Services.Interfaces
 {
     public interface ITicketService
     {
-        List<Ticket> GetFilteredAndSortedTickets(string searchEmail, string sortOrder);
+        List<Ticket> GetFilteredAndSortedTickets(string searchEmail, string sortOrder, User currentUser);
         
         Ticket? GetByTicketNumber(int ticketNumber);
         CreateTicketViewModel BuildVmForCreate();

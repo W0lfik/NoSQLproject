@@ -9,14 +9,15 @@
 
     <!-- Search + Navigation buttons -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <form method="get" class="d-flex align-items-center w-50">
+        <form method="get" class="d-flex align-items-center">
             <input type="text"
-                   name="searchEmail"
-                   value="@Context.Request.Query["searchEmail"]"
-                   class="form-control w-100"
-                   placeholder="Filter by email" />
+                   name="searchQuery"
+                   value="@Context.Request.Query["searchQuery"]"
+                   class="form-control"
+                   placeholder="Search tickets" />
             <button type="submit" class="btn btn-primary ms-2">Search</button>
         </form>
+
 
         <div class="d-flex">
             <a asp-action="CurrentIncidents" class="btn btn-secondary me-2">CURRENT INCIDENTS</a>
