@@ -118,8 +118,6 @@ public class TicketController : Controller
             return NotFound();
 
         ViewBag.Role = user.TypeOfUser;
-        ViewBag.UserId = user.Id;
-
 
         bool isAssignedEmployee =
             ticket.HandledBy != null &&
