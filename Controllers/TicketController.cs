@@ -113,10 +113,25 @@ public class TicketController : Controller
         if (user == null)
             return Unauthorized();
 
-        ViewBag.Role = user.TypeOfUser;
-
         Ticket ticket = _ticketService.GetByTicketNumber(ticketNumber);
-        return ticket is null ? NotFound() : View(ticket);
+        if (ticket == null)
+            return NotFound();
+
+        ViewBag.Role = user.TypeOfUser;
+        ViewBag.UserId = user.Id;
+
+
+        bool isAssignedEmployee =
+            ticket.HandledBy != null &&
+            ticket.HandledBy.Any(u => u.Id == user.Id);
+
+        bool canManage =
+            user.TypeOfUser == TypeOfUser.service_desk ||
+            (user.TypeOfUser == TypeOfUser.employee && isAssignedEmployee);
+
+        ViewBag.CanManage = canManage;
+
+        return View(ticket);
     }
 
     [HttpGet("Ticket/Edit/{ticketNumber:int}")]

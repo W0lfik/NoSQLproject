@@ -10,13 +10,13 @@
     </div>
 
     <div class="mb-3 d-flex gap-2">
-        @if (ViewBag.Role == NoSQLproject.Models.TypeOfUser.employee ||
-        ViewBag.Role == NoSQLproject.Models.TypeOfUser.service_desk)
+        @if (ViewBag.CanManage == true)
         {
             <a asp-action="Manage" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-warning text-white">
                 Manage
             </a>
         }
+
         <div>
             @if (ViewBag.Role == NoSQLproject.Models.TypeOfUser.admin)
             {
