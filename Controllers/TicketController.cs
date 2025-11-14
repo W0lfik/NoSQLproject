@@ -124,8 +124,7 @@ public class TicketController : Controller
             ticket.HandledBy.Any(u => u.Id == user.Id);
 
         bool canManage =
-            user.TypeOfUser == TypeOfUser.service_desk ||
-            (user.TypeOfUser == TypeOfUser.employee && isAssignedEmployee);
+            user.TypeOfUser == TypeOfUser.service_desk || (user.TypeOfUser == TypeOfUser.employee && isAssignedEmployee) || user.TypeOfUser == TypeOfUser.admin;
 
         ViewBag.CanManage = canManage;
 

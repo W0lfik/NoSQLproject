@@ -16,21 +16,24 @@
             Manage
         </button>
         <div>
-            <a asp-action="Edit" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-primary w-100">
-                Edit
-            </a>
+            @if (ViewBag.Role == TypeOfUser.admin)
+            {
+                <a asp-action="Edit" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-primary">
+                    Edit
+                </a>
+            }
         </div>
+
         <div>
-            <form asp-action="Delete" asp-route-ticketNumber="@Model.Ticket.TicketNumber" method="post"
-                  class="d-inline w-100">
+            <form asp-action="Delete" asp-route-ticketNumber="@Model.Ticket.TicketNumber" method="post" class="d-inline w-100">
                 <button type="submit" class="btn btn-danger w-100"
                         onclick="return confirm('Delete this ticket?');">
                     Delete
                 </button>
             </form>
         </div>
-        <div>
-            <a asp-action="Details" asp-route-ticketNumber="@Model.Ticket.TicketNumber" class="btn btn-secondary w-100">Back</a>
+
+        <div><a asp-action="Index" class="btn btn-secondary w-100">Back</a>
         </div>
     </div>
 </div>

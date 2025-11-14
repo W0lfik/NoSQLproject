@@ -18,7 +18,7 @@
         }
 
         <div>
-            @if (ViewBag.Role == NoSQLproject.Models.TypeOfUser.admin)
+            @if (ViewBag.Role == TypeOfUser.admin)
             {
                 <a asp-action="Edit" asp-route-ticketNumber="@Model.TicketNumber" class="btn btn-primary">
                     Edit
